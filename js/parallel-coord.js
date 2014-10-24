@@ -68,9 +68,27 @@ dimensions.map(function(d) {
       .attr("y", -9)
       .text(function(d) { return d; });
 
+  // Add and store a brush for each axis.
+  g.append("g")
+      .attr("class", "brush")
+      .each(function(d) { d3.select(this).call(yScale[d].brush = d3.svg.brush().y(yScale[d]).on("brush", brush)); })
+    .selectAll("rect")
+      .attr("x", -8)
+      .attr("width", 16);
 });
 
 // Returns the path for a given data point.
 function path(d) {
   return line(dimensions.map(function(p) { return [xScale(p), yScale[p](d[p])]; }));
+}
+
+// Handles a brush event, toggling the display of foreground lines.
+function brush() {
+  var actives = dimensions.filter(function(p) { return !yScale[p].brush.empty(); }),
+      extents = actives.map(function(p) { return yScale[p].brush.extent(); });
+  foreground.style("display", function(d) {
+    return actives.every(function(p, i) {
+      return extents[i][0] <= d[p] && d[p] <= extents[i][1];
+    }) ? null : "none";
+  });
 }
