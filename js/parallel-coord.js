@@ -21,19 +21,27 @@ timePeriod = "Intertrial Interval";
 d3.csv("DATA/" + timePeriod + " apc.csv", function(error, neurons) {
 
 // Filter out sorting Variables
-dimensions = d3.keys(neurons[0]).filter(function(d) {
+  dimensions = d3.keys(neurons[0]).filter(function(dim) {
       var sortingVariables = ["Neurons", "Session_Name", "Wire_Number", "Unit_Number", "Brain_Area", "Monkey", "Average_Firing_Rate"];
-      return sortingVariables.indexOf(d) == -1;
+      return sortingVariables.indexOf(dim) == -1;
     });
 
-// Set xScale domain
-xScale.domain(dimensions);
+  // Set xScale domain
+  xScale.domain(dimensions);
 
-// Set yScale domain and range by looping over each data dimension and getting its max and min
-dimensions.map(function(d) {
-  yScale[d] = d3.scale.linear()
-        .domain(d3.extent(neurons, function(p) { return +p[d]; }))
-        .range([height, 0]);
+  // Set yScale domain and range by looping over each data dimension and getting its max and min
+  yMin = d3.min(dimensions.map(function(dim) {
+        return d3.min(neurons, function(neuron) { return +neuron[dim]; });
+  }));
+
+  yMax = d3.max(dimensions.map(function(dim) {
+          return d3.max(neurons, function(neuron) { return +neuron[dim]; });
+    }));
+
+  // Set yScale for each dimension
+  d3.keys(neurons[0]).filter(function(dim) {
+    yScale[dim] = d3.scale.linear().domain([yMin, yMax]).range([height, 0]);
+    return;
   });
 
    // Add grey background lines for context.
@@ -66,29 +74,31 @@ dimensions.map(function(d) {
     .append("text")
       .style("text-anchor", "middle")
       .attr("y", -9)
-      .text(function(d) { return d; });
+      .text(function(dim) { return dim; });
 
   // Add and store a brush for each axis.
   g.append("g")
       .attr("class", "brush")
-      .each(function(d) { d3.select(this).call(yScale[d].brush = d3.svg.brush().y(yScale[d]).on("brush", brush)); })
+      .each(function(dim) {
+          d3.select(this).call(yScale[dim].brush = d3.svg.brush().y(yScale[dim]).on("brush", brush));
+        })
     .selectAll("rect")
       .attr("x", -8)
       .attr("width", 16);
 });
 
 // Returns the path for a given data point.
-function path(d) {
-  return line(dimensions.map(function(p) { return [xScale(p), yScale[p](d[p])]; }));
+function path(data_point) {
+  return line(dimensions.map(function(dim) { return [xScale(dim), yScale[dim](data_point[dim])]; }));
 }
 
 // Handles a brush event, toggling the display of foreground lines.
 function brush() {
-  var actives = dimensions.filter(function(p) { return !yScale[p].brush.empty(); }),
-      extents = actives.map(function(p) { return yScale[p].brush.extent(); });
-  foreground.style("display", function(d) {
-    return actives.every(function(p, i) {
-      return extents[i][0] <= d[p] && d[p] <= extents[i][1];
+  var actives = dimensions.filter(function(dim) { return !yScale[dim].brush.empty(); }),
+      extents = actives.map(function(dim) { return yScale[dim].brush.extent(); });
+  foreground.style("display", function(neuron) {
+    return actives.every(function(active_dim, extent_ind) {
+      return (extents[extent_ind][0] <= neuron[active_dim]) && (neuron[active_dim] <= extents[extent_ind][1]);
     }) ? null : "none";
   });
 }
