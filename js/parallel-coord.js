@@ -1,9 +1,9 @@
-var margin = {top: 30, right: 10, bottom: 10, left: 10},
-    width = 960 - margin.left - margin.right,
-    height = 500 - margin.top - margin.bottom;
+var margin = {top: 30, right: 10, bottom: 10, left: 105},
+    width = 700 - margin.left - margin.right,
+    height = 700 - margin.top - margin.bottom;
 
-var xScale = d3.scale.ordinal().rangePoints([0, width], 1),
-    yScale = {};
+var yScale = d3.scale.ordinal().rangePoints([height, 0], 1),
+    xScale = {};
 
 var line = d3.svg.line(),
     axis = d3.svg.axis().orient("left"),
@@ -26,21 +26,21 @@ d3.csv("DATA/" + timePeriod + " apc.csv", function(error, neurons) {
       return sortingVariables.indexOf(dim) == -1;
     });
 
-  // Set xScale domain
-  xScale.domain(dimensions);
+  // Set yScale domain
+  yScale.domain(dimensions);
 
-  // Set yScale domain and range by looping over each data dimension and getting its max and min
-  yMin = d3.min(dimensions.map(function(dim) {
+  // Set xScale domain and range by looping over each data dimension and getting its max and min
+  xMin = d3.min(dimensions.map(function(dim) {
         return d3.min(neurons, function(neuron) { return +neuron[dim]; });
   }));
 
-  yMax = d3.max(dimensions.map(function(dim) {
+  xMax = d3.max(dimensions.map(function(dim) {
           return d3.max(neurons, function(neuron) { return +neuron[dim]; });
     }));
 
-  // Set yScale for each dimension
-  d3.keys(neurons[0]).filter(function(dim) {
-    yScale[dim] = d3.scale.linear().domain([yMin, yMax]).range([height, 0]);
+  // Set xScale for each dimension
+  dimensions.filter(function(dim) {
+    xScale[dim] = d3.scale.linear().domain([xMin, xMax]).range([0, width]);
     return;
   });
 
@@ -65,40 +65,44 @@ d3.csv("DATA/" + timePeriod + " apc.csv", function(error, neurons) {
       .data(dimensions)
     .enter().append("g")
       .attr("class", "dimension")
-      .attr("transform", function(d) { return "translate(" + xScale(d) + ")"; });
+      .attr("transform", function(d) { return "translate(0," + yScale(d) + ")"; });
 
   // Add an axis and title.
   g.append("g")
       .attr("class", "axis")
-      .each(function(d) { d3.select(this).call(axis.scale(yScale[d])); })
+      .each(function(dim) { d3.select(this).call(makeXAxis(dim)); })
     .append("text")
       .style("text-anchor", "middle")
-      .attr("y", -9)
+      .attr("x", -55)
       .text(function(dim) { return dim; });
 
   // Add and store a brush for each axis.
   g.append("g")
       .attr("class", "brush")
       .each(function(dim) {
-          d3.select(this).call(yScale[dim].brush = d3.svg.brush().y(yScale[dim]).on("brush", brush));
+          d3.select(this).call(xScale[dim].brush = d3.svg.brush().x(xScale[dim]).on("brush", brush));
         })
     .selectAll("rect")
-      .attr("x", -8)
-      .attr("width", 16);
+      .attr("y", -8)
+      .attr("height", 16);
 });
 
 // Returns the path for a given data point.
 function path(data_point) {
-  return line(dimensions.map(function(dim) { return [xScale(dim), yScale[dim](data_point[dim])]; }));
+  return line(dimensions.map(function(dim) { return [xScale[dim](data_point[dim]), yScale(dim)]; }));
 }
 
 // Handles a brush event, toggling the display of foreground lines.
 function brush() {
-  var actives = dimensions.filter(function(dim) { return !yScale[dim].brush.empty(); }),
-      extents = actives.map(function(dim) { return yScale[dim].brush.extent(); });
+  var actives = dimensions.filter(function(dim) { return !xScale[dim].brush.empty(); }),
+      extents = actives.map(function(dim) { return xScale[dim].brush.extent(); });
   foreground.style("display", function(neuron) {
     return actives.every(function(active_dim, extent_ind) {
       return (extents[extent_ind][0] <= neuron[active_dim]) && (neuron[active_dim] <= extents[extent_ind][1]);
     }) ? null : "none";
   });
+}
+
+function makeXAxis(dim) {
+  return axis.scale(xScale[dim]).orient("bottom");
 }
