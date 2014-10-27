@@ -26,6 +26,8 @@ d3.csv("DATA/" + timePeriod + " apc.csv", function(error, neurons) {
       return sortingVariables.indexOf(dim) == -1;
     });
 
+
+
   // Set yScale domain
   yScale.domain(dimensions);
 
@@ -80,7 +82,7 @@ d3.csv("DATA/" + timePeriod + " apc.csv", function(error, neurons) {
   g.append("g")
       .attr("class", "brush")
       .each(function(dim) {
-          d3.select(this).call(xScale[dim].brush = d3.svg.brush().x(xScale[dim]).on("brush", brush));
+          d3.select(this).call(makeXBrush(dim));
         })
     .selectAll("rect")
       .attr("y", -8)
@@ -105,4 +107,9 @@ function brush() {
 
 function makeXAxis(dim) {
   return axis.scale(xScale[dim]).orient("bottom");
+}
+
+function makeXBrush(dim) {
+  xScale[dim].brush = d3.svg.brush().x(xScale[dim]).on("brush", brush);
+  return xScale[dim].brush;
 }
