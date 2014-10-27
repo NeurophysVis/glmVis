@@ -20,13 +20,14 @@ var svg = d3.select("body").append("svg")
 timePeriod = "Intertrial Interval";
 d3.csv("DATA/" + timePeriod + " apc.csv", function(error, neurons) {
 
-// Filter out sorting Variables
+  // Filter out sorting Variables
   dimensions = d3.keys(neurons[0]).filter(function(dim) {
       var sortingVariables = ["Neurons", "Session_Name", "Wire_Number", "Unit_Number", "Brain_Area", "Monkey", "Average_Firing_Rate"];
       return sortingVariables.indexOf(dim) == -1;
     });
 
-
+  // Reverse dimension order for better understandability.
+  dimensions = dimensions.reverse();
 
   // Set yScale domain
   yScale.domain(dimensions);
@@ -76,7 +77,7 @@ d3.csv("DATA/" + timePeriod + " apc.csv", function(error, neurons) {
     .append("text")
       .style("text-anchor", "middle")
       .attr("x", -55)
-      .text(function(dim) { return dim; });
+      .text(function(dim) { return fixDimNames(dim); });
 
   // Add and store a brush for each axis.
   g.append("g")
@@ -112,4 +113,11 @@ function makeXAxis(dim) {
 function makeXBrush(dim) {
   xScale[dim].brush = d3.svg.brush().x(xScale[dim]).on("brush", brush);
   return xScale[dim].brush;
+}
+
+function fixDimNames(dim_name) {
+  var pat1 = /plus/;
+  var fixed_name = dim_name.replace(pat1, "+");
+  var pat2 = /_/;
+  return fixed_name.replace(pat2, " ");
 }
