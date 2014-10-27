@@ -107,7 +107,20 @@ function brush() {
 }
 
 function makeXAxis(dim) {
-  return axis.scale(xScale[dim]).orient("bottom");
+  var newAxis = axis
+        .scale(xScale[dim])
+        .orient("top");
+
+  if (dim.indexOf("Rule") > -1) {
+      newAxis
+          .ticks(5);
+  } else {
+      newAxis
+          .ticks(0)
+          .tickSize(0);
+  }
+
+  return newAxis;
 }
 
 function makeXBrush(dim) {
