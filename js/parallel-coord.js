@@ -1,4 +1,4 @@
-var margin = {top: 30, right: 10, bottom: 10, left: 105},
+var margin = {top: 30, right: 10, bottom: 10, left: 205},
     width = 700 - margin.left - margin.right,
     height = 700 - margin.top - margin.bottom;
 
@@ -75,9 +75,12 @@ d3.csv("DATA/" + timePeriod + " apc.csv", function(error, neurons) {
       .attr("class", "axis")
       .each(function(dim) { d3.select(this).call(makeXAxis(dim)); })
     .append("text")
-      .style("text-anchor", "middle")
-      .attr("x", -55)
+      .style("text-anchor", "end")
+      .attr("x", -5)
+      .attr("y", 4)
       .text(function(dim) { return fixDimNames(dim); });
+
+  d3.select(g[0][0]).attr("class", "#rule.axis");
 
   // Add and store a brush for each axis.
   g.append("g")
@@ -92,7 +95,9 @@ d3.csv("DATA/" + timePeriod + " apc.csv", function(error, neurons) {
 
 // Returns the path for a given data point.
 function path(data_point) {
-  return line(dimensions.map(function(dim) { return [xScale[dim](data_point[dim]), yScale(dim)]; }));
+  return line(dimensions.map(function(dim) {
+    return [xScale[dim](data_point[dim]), yScale(dim)];
+    }));
 }
 
 // Handles a brush event, toggling the display of foreground lines.
@@ -105,29 +110,31 @@ function brush() {
     }) ? null : "none";
   });
 }
-
+// Creates the x-axis for a given dimension
 function makeXAxis(dim) {
   var newAxis = axis
         .scale(xScale[dim])
         .orient("top");
 
-  if (dim.indexOf("Rule") > -1) {
-      newAxis
-          .ticks(5);
+  if (dim.indexOf("Rule") == -1) {
+    newAxis
+        .ticks(0)
+        .tickSize(0);
   } else {
-      newAxis
-          .ticks(0)
-          .tickSize(0);
+    newAxis
+        .ticks(5)
+        .tickSize(0);
+
   }
 
   return newAxis;
 }
-
+// Creates a brush object for a given dimension
 function makeXBrush(dim) {
   xScale[dim].brush = d3.svg.brush().x(xScale[dim]).on("brush", brush);
   return xScale[dim].brush;
 }
-
+// Replaces underscores with blanks and "plus" with "+"
 function fixDimNames(dim_name) {
   var pat1 = /plus/;
   var fixed_name = dim_name.replace(pat1, "+");
