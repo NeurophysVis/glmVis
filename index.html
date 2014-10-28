@@ -1,9 +1,14 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <style>
+body {
+  margin: 0 0;
+  width: 100%;
+  font-weight: normal;
+}
 
 svg {
-  font: 16px sans-serif;
+  font: 11px sans-serif;
 }
 
 .background path {
@@ -19,26 +24,30 @@ svg {
 }
 
 .brush .extent {
-  fill-opacity: 0.2;
   stroke: #fff;
+  fill-opacity: .125;
   shape-rendering: crispEdges;
 }
 
-.axis line,
-.axis path {
+.grid line, .axis line,
+.grid path, .axis path {
   fill: none;
-  stroke: #636363;
+  stroke: black;
+  stroke-width: 1px;
   shape-rendering: crispEdges;
-  opacity: 0.7;
+  opacity: 0.1;
 }
 
-#rule.axis {
-  stroke: #000;
+.grid text {
+  text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, -1px 0 0 #fff;
+}
+
+.axis line, .axis path {
   opacity: 1.0;
 }
 
-.axis text {
-  text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, -1px 0 0 #fff;
+.grid text {
+  font: 16px
 }
 
 
