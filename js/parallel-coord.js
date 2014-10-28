@@ -55,6 +55,14 @@ d3.csv("DATA/" + timePeriod + " apc.csv", function(error, neurons) {
    .enter().append("path")
      .attr("d", path);
 
+  // Add blue foreground lines for focus.
+  foreground = svg.append("g")
+      .attr("class", "foreground")
+    .selectAll("path")
+      .data(neurons)
+    .enter().append("path")
+      .attr("d", path);
+
   // Add a group element for each dimension.
   var g = svg.selectAll(".dimension")
       .data(dimensions)
@@ -71,15 +79,6 @@ d3.csv("DATA/" + timePeriod + " apc.csv", function(error, neurons) {
       .attr("x", -5)
       .attr("y", 4)
       .text(function(dim) { return fixDimNames(dim); });
-
-  // Add blue foreground lines for focus.
-  foreground = svg.append("g")
-      .attr("class", "foreground")
-    .selectAll("path")
-      .data(neurons)
-    .enter().append("path")
-      .attr("d", path);
-
 
   // Add and store a brush for each axis.
   g.append("g")
