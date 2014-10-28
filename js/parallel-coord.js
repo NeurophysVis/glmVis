@@ -47,21 +47,13 @@ d3.csv("DATA/" + timePeriod + " apc.csv", function(error, neurons) {
     return;
   });
 
-   // Add grey background lines for context.
-  background = svg.append("g")
-      .attr("class", "background")
-    .selectAll("path")
-      .data(neurons)
-    .enter().append("path")
-      .attr("d", path);
-
-  // Add blue foreground lines for focus.
-  foreground = svg.append("g")
-      .attr("class", "foreground")
-    .selectAll("path")
-      .data(neurons)
-    .enter().append("path")
-      .attr("d", path);
+  // Add grey background lines for context.
+ background = svg.append("g")
+     .attr("class", "background")
+   .selectAll("path")
+     .data(neurons)
+   .enter().append("path")
+     .attr("d", path);
 
   // Add a group element for each dimension.
   var g = svg.selectAll(".dimension")
@@ -80,7 +72,14 @@ d3.csv("DATA/" + timePeriod + " apc.csv", function(error, neurons) {
       .attr("y", 4)
       .text(function(dim) { return fixDimNames(dim); });
 
-  d3.select(g[0][0]).attr("class", "#rule.axis");
+  // Add blue foreground lines for focus.
+  foreground = svg.append("g")
+      .attr("class", "foreground")
+    .selectAll("path")
+      .data(neurons)
+    .enter().append("path")
+      .attr("d", path);
+
 
   // Add and store a brush for each axis.
   g.append("g")
@@ -119,11 +118,11 @@ function makeXAxis(dim) {
   if (dim.indexOf("Rule") == -1) {
     newAxis
         .ticks(0)
-        .tickSize(0);
+        .tickSize(0, 0, 0);
   } else {
     newAxis
         .ticks(5)
-        .tickSize(0);
+        .tickSize(-height, 0, 0);
 
   }
 
