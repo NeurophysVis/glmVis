@@ -1,6 +1,6 @@
 var margin = {top: 30, right: 10, bottom: 10, left: 150},
-width = 500 - margin.left - margin.right,
-height = 500 - margin.top - margin.bottom;
+width = 350 - margin.left - margin.right,
+height = 350 - margin.top - margin.bottom;
 
 var yScale = d3.scale.ordinal().rangePoints([height, 0], 1),
 xScale = {};
@@ -12,8 +12,10 @@ axis = d3.svg.axis().orient("left"),
 background,
 foreground;
 
+var formatting = d3.format(".3n");
+
 // Load Data
-timePeriod = "Stimulus Response";
+timePeriod = "Rule Stimulus";
 d3.csv("DATA/" + timePeriod + " apc.csv", function(error, data) {
 
   // Filter out sorting Variables
@@ -25,6 +27,13 @@ d3.csv("DATA/" + timePeriod + " apc.csv", function(error, data) {
   // Reverse dimension order for better understandability.
   dimensions = dimensions.reverse();
 
+  // Normalize Firing Rates
+  data.map(function(neuron, neuron_ind) {
+    dimensions.map(function(dim) {
+      data[neuron_ind][dim] = formatting(+neuron[dim]/+neuron["Average_Firing_Rate"]);
+    });
+  });
+
   // Set xScale domain and range by looping over each data dimension and getting its max and min
   xMin = d3.min(dimensions.map(function(dim) {
     return d3.min(data, function(neuron) { return +neuron[dim]; });
@@ -33,6 +42,12 @@ d3.csv("DATA/" + timePeriod + " apc.csv", function(error, data) {
   xMax = d3.max(dimensions.map(function(dim) {
     return d3.max(data, function(neuron) { return +neuron[dim]; });
   }));
+
+  if (Math.abs(xMin) > Math.abs(xMax)) {
+    xMax = Math.abs(xMin);
+  } else if (Math.abs(xMin) < Math.abs(xMax)) {
+    xMin = -1 * Math.abs(xMax);
+  };
 
   // Set up average firing rate scale
   var firingRate_extent = d3.extent(data, function(neuron) {
@@ -82,6 +97,13 @@ function drawParallel() {
       .attr("width", width + margin.left + margin.right )
       .attr("height", height + margin.top + margin.bottom )
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+  svg.append("text")
+        .attr("x", (width / 2))
+        .attr("y", 0 - (margin.top / 2))
+        .attr("text-anchor", "middle")
+        .style("font-size", "16px")
+        .text(function(d) {return d.key;});
 
   // Add grey background lines for context.
   background = svg.append("g")
