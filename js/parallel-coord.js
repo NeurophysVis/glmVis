@@ -56,10 +56,22 @@ d3.csv("DATA/" + timePeriod + " apc.csv", function(error, data) {
 function drawParallel() {
   div = d3.select("#vis").selectAll(".chart").data(neurons);
 
-  div.enter().append("div").attr("id", function(d) {return d.key;}).append("svg");
+  div.enter().append("div")
+    .attr("class", "chart")
+    .attr("id", function(d) {return d.key;})
+    .append("svg");
+
   svg = div.select("svg")
       .attr("width", width + margin.left + margin.right )
       .attr("height", height + margin.top + margin.bottom );
+
+  // Add grey background lines for context.
+  background = svg.append("g")
+  .attr("class", "background")
+  .selectAll("path")
+  .data(function(d) {return d.values;})
+  .enter().append("path")
+  .attr("d", path);
 
   // Add blue foreground lines for focus.
   foreground = svg.append("g")
