@@ -25,9 +25,6 @@ d3.csv("DATA/" + timePeriod + " apc.csv", function(error, data) {
   // Reverse dimension order for better understandability.
   dimensions = dimensions.reverse();
 
-  // Set yScale domain
-  yScale.domain(dimensions);
-
   // Set xScale domain and range by looping over each data dimension and getting its max and min
   xMin = d3.min(dimensions.map(function(dim) {
     return d3.min(data, function(neuron) { return +neuron[dim]; });
@@ -37,9 +34,19 @@ d3.csv("DATA/" + timePeriod + " apc.csv", function(error, data) {
     return d3.max(data, function(neuron) { return +neuron[dim]; });
   }));
 
+  // Set up average firing rate scale
+  var firingRate_extent = d3.extent(data, function(neuron) {
+    return +neuron["Average_Firing_Rate"];
+  });
+
+  // Nest data by brain area
   neurons = d3.nest()
     .key(function(d) { return d["Brain_Area"]; })
     .entries(data);
+
+  firingRate_scale = neurons.map(function(brain_area) {
+    return d3.scale.linear().domain(firingRate_extent).range([0, width]);
+  });
 
   // Set xScale for each dimension and brain area
   xScale = neurons.map(function(dat) {
@@ -48,6 +55,16 @@ d3.csv("DATA/" + timePeriod + " apc.csv", function(error, data) {
     });
   });
 
+  // Add average firing rate to beginning of dimensions array
+  dimensions.unshift("Average_Firing_Rate");
+  xScale.map(function(brain_area_dim, ind) {
+    brain_area_dim.unshift(firingRate_scale[ind]);
+  });
+
+  // Set yScale domain
+  yScale.domain(dimensions);
+
+  // Draw plot
   drawParallel()
 
 });
@@ -144,18 +161,29 @@ function brush() {
 }
 // Creates the x-axis for a given dimension
 function makeXAxis(dim, dim_ind, div_ind) {
-  var newAxis = axis
-  .scale(xScale[div_ind][dim_ind])
-  .orient("top")
-  .tickSize(0, 0, 0);
+  var newAxis;
 
-  if (dim.indexOf("Rule") == -1) {
-    newAxis
-    .ticks(0);
-  } else {
-    newAxis
-    .ticks(5)
+  newAxis = axis
+    .scale(xScale[div_ind][dim_ind])
+    .tickSize(0, 0, 0);
+
+  switch(dim) {
+    case "Rule":
+      newAxis
+        .orient("top")
+        .ticks(5);
+      break;
+    case "Average_Firing_Rate":
+      newAxis
+        .orient("bottom")
+        .ticks(5);
+      break;
+    default:
+      newAxis
+        .orient("top")
+        .ticks(0);
   }
+
 
   return newAxis;
 }
