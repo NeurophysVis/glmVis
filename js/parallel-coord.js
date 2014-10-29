@@ -5,23 +5,19 @@ height = 700 - margin.top - margin.bottom;
 var yScale = d3.scale.ordinal().rangePoints([height, 0], 1),
 xScale = {};
 
+var data = {};
+
 var line = d3.svg.line(),
 axis = d3.svg.axis().orient("left"),
 background,
 foreground;
 
-var svg = d3.select("body").append("svg")
-.attr("width", width + margin.left + margin.right)
-.attr("height", height + margin.top + margin.bottom)
-.append("g")
-.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
 // Load Data
 timePeriod = "Intertrial Interval";
-d3.csv("DATA/" + timePeriod + " apc.csv", function(error, neurons) {
+d3.csv("DATA/" + timePeriod + " apc.csv", function(error, data) {
 
   // Filter out sorting Variables
-  dimensions = d3.keys(neurons[0]).filter(function(dim) {
+  dimensions = d3.keys(data[0]).filter(function(dim) {
     var sortingVariables = ["Neurons", "Session_Name", "Wire_Number", "Unit_Number", "Brain_Area", "Monkey", "Average_Firing_Rate"];
     return sortingVariables.indexOf(dim) == -1;
   });
@@ -34,35 +30,42 @@ d3.csv("DATA/" + timePeriod + " apc.csv", function(error, neurons) {
 
   // Set xScale domain and range by looping over each data dimension and getting its max and min
   xMin = d3.min(dimensions.map(function(dim) {
-    return d3.min(neurons, function(neuron) { return +neuron[dim]; });
+    return d3.min(data, function(neuron) { return +neuron[dim]; });
   }));
 
   xMax = d3.max(dimensions.map(function(dim) {
-    return d3.max(neurons, function(neuron) { return +neuron[dim]; });
+    return d3.max(data, function(neuron) { return +neuron[dim]; });
   }));
 
-  // Set xScale for each dimension
-  dimensions.map(function(dim) {
-    xScale[dim] = d3.scale.linear().domain([xMin, xMax]).range([0, width]);
+  neurons = d3.nest()
+    .key(function(d) { return d["Brain_Area"]; })
+    .entries(data);
+
+  // Set xScale for each dimension and brain area
+  xScale = neurons.map(function(dat) {
+    return dimensions.map(function(dim) {
+      return d3.scale.linear().domain([xMin, xMax]).range([0, width]);
+    });
   });
 
-var brain_areas = d3.nest()
-    .key(function(d) { return d["Brain_Area"]; })
-    .entries(neurons);
+  drawParallel()
 
-  // // Add grey background lines for context.
-  // background = svg.append("g")
-  // .attr("class", "background")
-  // .selectAll("path")
-  // .data(neurons)
-  // .enter().append("path")
-  // .attr("d", path);
+});
+
+// Draws parallel line plot
+function drawParallel() {
+  div = d3.select("#vis").selectAll(".chart").data(neurons);
+
+  div.enter().append("div").attr("id", function(d) {return d.key;}).append("svg");
+  svg = div.select("svg")
+      .attr("width", width + margin.left + margin.right )
+      .attr("height", height + margin.top + margin.bottom );
 
   // Add blue foreground lines for focus.
   foreground = svg.append("g")
   .attr("class", "foreground")
   .selectAll("path")
-  .data(neurons)
+  .data(function(d) {return d.values;})
   .enter().append("path")
   .attr("d", path);
 
@@ -76,7 +79,9 @@ var brain_areas = d3.nest()
   // Add an axis and title.
   g.append("g")
   .attr("class", "grid")
-      .each(function(dim) { d3.select(this).call(makeXAxis(dim)); })
+      .each(function(dim, dim_ind, div_ind) {
+          d3.select(this).call(makeXAxis(dim, dim_ind, div_ind));
+        })
     .append("text")
       .style("text-anchor", "end")
       .attr("x", -5)
@@ -86,42 +91,48 @@ var brain_areas = d3.nest()
   // Add and store a brush for each axis.
   g.append("g")
   .attr("class", "brush")
-  .each(function(dim) {
-    d3.select(this).call(makeXBrush(dim));
+  .each(function(dim, dim_ind, div_ind) {
+    d3.select(this).call(makeXBrush(dim, dim_ind, div_ind));
   })
   .selectAll("rect")
   .attr("y", -8)
   .attr("height", 16);
 
-  //
-  // g.selectAll(".grid")
-  // .on("mouseover", function(d){
-  //     d3.select(this).style("opacity", 0.0)
-  //   });
-
-});
+}
 
 // Returns the path for a given data point.
-function path(data_point) {
-  return line(dimensions.map(function(dim) {
-    return [xScale[dim](data_point[dim]), yScale(dim)];
+function path(data_point, ind, div_ind) {
+  return line(dimensions.map(function(dim, dim_ind) {
+    return [xScale[div_ind][dim_ind](data_point[dim]), yScale(dim)];
   }));
 }
 
 // Handles a brush event, toggling the display of foreground lines.
 function brush() {
-  var actives = dimensions.filter(function(dim) { return !xScale[dim].brush.empty(); }),
-  extents = actives.map(function(dim) { return xScale[dim].brush.extent(); });
+  var actives = dimensions.filter(function(dim, dim_ind) {
+    return !xScale[0][dim_ind].brush.empty() || !xScale[1][dim_ind].brush.empty();
+    }),
+  extents = neurons.map(function(neuron, div_ind) {
+    return actives.map(function(dim) {
+      var dim_ind = dimensions.indexOf(dim);
+      return xScale[div_ind][dim_ind].brush.extent();
+      })
+    });
   foreground.style("display", function(neuron) {
     return actives.every(function(active_dim, extent_ind) {
-      return (extents[extent_ind][0] <= neuron[active_dim]) && (neuron[active_dim] <= extents[extent_ind][1]);
+      return ((extents[0][extent_ind][0] <= neuron[active_dim])
+        && (neuron[active_dim] <= extents[0][extent_ind][1]))
+         ||
+        ((extents[1][extent_ind][0] <= neuron[active_dim])
+          && (neuron[active_dim] <= extents[1][extent_ind][1])
+      );
     }) ? null : "none";
   });
 }
 // Creates the x-axis for a given dimension
-function makeXAxis(dim) {
+function makeXAxis(dim, dim_ind, div_ind) {
   var newAxis = axis
-  .scale(xScale[dim])
+  .scale(xScale[div_ind][dim_ind])
   .orient("top")
   .tickSize(0, 0, 0);
 
@@ -136,9 +147,9 @@ function makeXAxis(dim) {
   return newAxis;
 }
 // Creates a brush object for a given dimension
-function makeXBrush(dim) {
-  xScale[dim].brush = d3.svg.brush().x(xScale[dim]).on("brush", brush);
-  return xScale[dim].brush;
+function makeXBrush(dim, dim_ind, div_ind) {
+  xScale[div_ind][dim_ind].brush = d3.svg.brush().x(xScale[div_ind][dim_ind]).on("brush", brush);
+  return xScale[div_ind][dim_ind].brush;
 }
 // Replaces underscores with blanks and "plus" with "+"
 function fixDimNames(dim_name) {
