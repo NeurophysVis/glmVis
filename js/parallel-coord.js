@@ -1,6 +1,6 @@
-var margin = {top: 30, right: 10, bottom: 10, left: 205},
-width = 700 - margin.left - margin.right,
-height = 700 - margin.top - margin.bottom;
+var margin = {top: 30, right: 10, bottom: 10, left: 150},
+width = 500 - margin.left - margin.right,
+height = 500 - margin.top - margin.bottom;
 
 var yScale = d3.scale.ordinal().rangePoints([height, 0], 1),
 xScale = {};
@@ -13,7 +13,7 @@ background,
 foreground;
 
 // Load Data
-timePeriod = "Intertrial Interval";
+timePeriod = "Stimulus Response";
 d3.csv("DATA/" + timePeriod + " apc.csv", function(error, data) {
 
   // Filter out sorting Variables
@@ -63,7 +63,8 @@ function drawParallel() {
 
   svg = div.select("svg")
       .attr("width", width + margin.left + margin.right )
-      .attr("height", height + margin.top + margin.bottom );
+      .attr("height", height + margin.top + margin.bottom )
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
   // Add grey background lines for context.
   background = svg.append("g")
@@ -165,8 +166,11 @@ function makeXBrush(dim, dim_ind, div_ind) {
 }
 // Replaces underscores with blanks and "plus" with "+"
 function fixDimNames(dim_name) {
-  var pat1 = /plus/;
-  var fixed_name = dim_name.replace(pat1, "+");
-  var pat2 = /_/;
-  return fixed_name.replace(pat2, " ");
+  var pat1 = /plus/,
+      pat2 = /_/g,
+      pat3 = /minus/;
+
+  var fixed_name = dim_name.replace(pat1, "+").replace(pat2, " ").replace(pat3, "-");
+
+  return fixed_name;
 }
