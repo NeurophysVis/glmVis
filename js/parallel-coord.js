@@ -1,6 +1,6 @@
 var margin = {top: 30, right: 10, bottom: 10, left: 150},
-width = 350 - margin.left - margin.right,
-height = 350 - margin.top - margin.bottom;
+width = 500 - margin.left - margin.right,
+height = 500 - margin.top - margin.bottom;
 
 var yScale = d3.scale.ordinal().rangePoints([height, 0], 1),
 xScale = {};
@@ -15,7 +15,7 @@ foreground;
 var formatting = d3.format(".3n");
 
 // Load Data
-timePeriod = "Rule Stimulus";
+timePeriod = "Stimulus Response";
 d3.csv("DATA/" + timePeriod + " apc.csv", function(error, data) {
 
   // Filter out sorting Variables
@@ -23,6 +23,11 @@ d3.csv("DATA/" + timePeriod + " apc.csv", function(error, data) {
     var sortingVariables = ["Neurons", "Session_Name", "Wire_Number", "Unit_Number", "Brain_Area", "Monkey", "Average_Firing_Rate"];
     return sortingVariables.indexOf(dim) == -1;
   });
+
+  // Exclude neurons less than 1 Hz
+  data = data.filter(function(d) {
+    return +d["Average_Firing_Rate"] >= 1;
+  })
 
   // Reverse dimension order for better understandability.
   dimensions = dimensions.reverse();
@@ -193,7 +198,7 @@ function makeXAxis(dim, dim_ind, div_ind) {
     case "Rule":
       newAxis
         .orient("top")
-        .ticks(5);
+        .ticks(3);
       break;
     case "Average_Firing_Rate":
       newAxis
