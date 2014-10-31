@@ -20,7 +20,7 @@ var toolTip = d3.select("body").append("div")
 var formatting = d3.format(".3n");
 
 // Load Data
-timePeriod = "Stimulus Response";
+timePeriod = "Rule Stimulus";
 d3.csv("DATA/" + timePeriod + " apc.csv", function(error, data) {
 
   // Filter out sorting Variables
@@ -31,7 +31,7 @@ d3.csv("DATA/" + timePeriod + " apc.csv", function(error, data) {
 
   // Exclude neurons less than 1 Hz
   data = data.filter(function(d) {
-    return +d["Average_Firing_Rate"] >= 0;
+    return +d["Average_Firing_Rate"] >= 2;
   })
 
   // Reverse dimension order for better understandability.
@@ -115,6 +115,14 @@ function drawParallel() {
         .style("font-size", "16px")
         .text(function(d) {return d.key;});
 
+  // Add grey background lines for context.
+  background = svg.append("g")
+  .attr("class", "background")
+  .selectAll("path")
+  .data(function(d) {return d.values;})
+  .enter().append("path")
+  .attr("d", path);
+
   // Add a group element for each dimension.
   var g = svg.selectAll(".dimension")
   .data(dimensions)
@@ -144,14 +152,6 @@ function drawParallel() {
   .selectAll("rect")
   .attr("y", -8)
   .attr("height", 16);
-
-  // Add grey background lines for context.
-  background = svg.append("g")
-  .attr("class", "background")
-  .selectAll("path")
-  .data(function(d) {return d.values;})
-  .enter().append("path")
-  .attr("d", path);
 
   // Add blue foreground lines for focus.
   foreground = svg.append("g")
@@ -244,8 +244,10 @@ function fixDimNames(dim_name) {
 
 function mouseover(d) {
 
+  d3.select(this).classed("active", true);
+
   toolTip
-             .style("opacity", .9)
+     .style("opacity", .9)
      .style("left", (d3.event.pageX - 40) + "px")
      .style("top", (d3.event.pageY - 80) + "px")
      .html(function() {
@@ -255,7 +257,7 @@ function mouseover(d) {
      });
 }
 function mouseout() {
-  console.log("out")
+
   toolTip
      .style("opacity", 1e-6);
   d3.select(this).classed("active", false);
