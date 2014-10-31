@@ -12,6 +12,11 @@ axis = d3.svg.axis().orient("left"),
 background,
 foreground;
 
+// Tool Tip
+var toolTip = d3.select("body").append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0);
+
 var formatting = d3.format(".3n");
 
 // Load Data
@@ -26,7 +31,7 @@ d3.csv("DATA/" + timePeriod + " apc.csv", function(error, data) {
 
   // Exclude neurons less than 1 Hz
   data = data.filter(function(d) {
-    return +d["Average_Firing_Rate"] >= 1;
+    return +d["Average_Firing_Rate"] >= 0;
   })
 
   // Reverse dimension order for better understandability.
@@ -35,7 +40,7 @@ d3.csv("DATA/" + timePeriod + " apc.csv", function(error, data) {
   // Normalize Firing Rates
   data.map(function(neuron, neuron_ind) {
     dimensions.map(function(dim) {
-      data[neuron_ind][dim] = formatting(+neuron[dim]/+neuron["Average_Firing_Rate"]);
+      data[neuron_ind][dim] = formatting(100 * +neuron[dim]/+neuron["Average_Firing_Rate"]);
     });
   });
 
@@ -110,6 +115,36 @@ function drawParallel() {
         .style("font-size", "16px")
         .text(function(d) {return d.key;});
 
+  // Add a group element for each dimension.
+  var g = svg.selectAll(".dimension")
+  .data(dimensions)
+  .enter().append("g")
+  .attr("class", "dimension")
+  .attr("transform", function(d) { return "translate(0," + yScale(d) + ")"; });
+
+  // Add an axis and title.
+  g.append("g")
+  .attr("class", "grid")
+  .style("stroke-dasharray", ("3, 3"))
+      .each(function(dim, dim_ind, div_ind) {
+          d3.select(this).call(makeXAxis(dim, dim_ind, div_ind));
+        })
+    .append("text")
+      .style("text-anchor", "end")
+      .attr("x", -5)
+      .attr("y", 3)
+      .text(function(dim) { return fixDimNames(dim); });
+
+  //Add and store a brush for each axis.
+  g.append("g")
+  .attr("class", "brush")
+  .each(function(dim, dim_ind, div_ind) {
+    d3.select(this).call(makeXBrush(dim, dim_ind, div_ind));
+  })
+  .selectAll("rect")
+  .attr("y", -8)
+  .attr("height", 16);
+
   // Add grey background lines for context.
   background = svg.append("g")
   .attr("class", "background")
@@ -124,36 +159,9 @@ function drawParallel() {
   .selectAll("path")
   .data(function(d) {return d.values;})
   .enter().append("path")
-  .attr("d", path);
-
-  // Add a group element for each dimension.
-  var g = svg.selectAll(".dimension")
-  .data(dimensions)
-  .enter().append("g")
-  .attr("class", "dimension")
-  .attr("transform", function(d) { return "translate(0," + yScale(d) + ")"; });
-
-  // Add an axis and title.
-  g.append("g")
-  .attr("class", "grid")
-      .each(function(dim, dim_ind, div_ind) {
-          d3.select(this).call(makeXAxis(dim, dim_ind, div_ind));
-        })
-    .append("text")
-      .style("text-anchor", "end")
-      .attr("x", -5)
-      .attr("y", 4)
-      .text(function(dim) { return fixDimNames(dim); });
-
-  // Add and store a brush for each axis.
-  g.append("g")
-  .attr("class", "brush")
-  .each(function(dim, dim_ind, div_ind) {
-    d3.select(this).call(makeXBrush(dim, dim_ind, div_ind));
-  })
-  .selectAll("rect")
-  .attr("y", -8)
-  .attr("height", 16);
+  .attr("d", path)
+  .on("mouseover", mouseover)
+  .on("mouseout", mouseout);
 
 }
 
@@ -166,6 +174,10 @@ function path(data_point, ind, div_ind) {
 
 // Handles a brush event, toggling the display of foreground lines.
 function brush() {
+
+  toolTip
+     .style("opacity", 1e-6);
+
   var actives = dimensions.filter(function(dim, dim_ind) {
     return !xScale[0][dim_ind].brush.empty() || !xScale[1][dim_ind].brush.empty();
     }),
@@ -228,4 +240,23 @@ function fixDimNames(dim_name) {
   var fixed_name = dim_name.replace(pat1, "+").replace(pat2, " ").replace(pat3, "-");
 
   return fixed_name;
+}
+
+function mouseover(d) {
+
+  toolTip
+             .style("opacity", .9)
+     .style("left", (d3.event.pageX - 40) + "px")
+     .style("top", (d3.event.pageY - 80) + "px")
+     .html(function() {
+       return  d.Brain_Area + " Neuron " + d.Wire_Number + "." + d.Unit_Number + "<br>" +
+               "<b>" + d.Session_Name + "</b><br>" +
+               "Avg. Firing: " + d.Average_Firing_Rate+ " Hz";
+     });
+}
+function mouseout() {
+  console.log("out")
+  toolTip
+     .style("opacity", 1e-6);
+  d3.select(this).classed("active", false);
 }

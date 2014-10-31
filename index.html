@@ -17,9 +17,14 @@ svg {
   shape-rendering: crispEdges;
 }
 
+path:active {
+  stroke-width: 2px;
+}
+
 .foreground path {
   fill: none;
   stroke: steelblue;
+  stroke-width: 1px;
   opacity: 0.7;
 }
 
@@ -58,9 +63,45 @@ svg {
   padding-left:0;
 }
 
+div.tooltip {
+  position: absolute;
+  text-align: left;
+  width: 115px;
+  height: 45px;
+  padding: 10px 10px 2px 10px;
+  font: 11px sans-serif;
+  background: white;
+  border: 1px;
+  border-style: solid;
+  border-radius: 0px;
+  border-color: #808080;
+  pointer-events: none;
+}
+
+table{
+ width: 100%;
+ color: #000000;
+}
+
+th {
+ font: 14px sans-serif;
+ font-weight: bold;
+}
+
+td, tr {
+ text-align:center;
+}
+
+hr {
+ background-color: #808080;
+ color: #808080;
+ width: 100%;
+
+}
+
 </style>
 <body>
   <div id="vis"> </div>
-<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 <script type="text/javascript" src="js/parallel-coord.js"></script>
 </body>
