@@ -248,7 +248,7 @@ function mouseover(d) {
 
   toolTip
      .style("opacity", .9)
-     .style("left", (d3.event.pageX - 40) + "px")
+     .style("left", (d3.event.pageX + 30) + "px")
      .style("top", (d3.event.pageY - 80) + "px")
      .html(function() {
        return  d.Brain_Area + " Neuron " + d.Wire_Number + "." + d.Unit_Number + "<br>" +
