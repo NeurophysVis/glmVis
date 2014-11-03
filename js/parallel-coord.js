@@ -249,19 +249,19 @@ function fixDimNames(dim_name) {
 }
 // On mouseover, highlight line, pop up tooltip
 function mouseover(d) {
-
+  // Highlight line by increasing width and changing its color
   d3.select(this).classed("active", true);
-  // Select current line
-  var node = d3.select(this).node(),
-  // Find group line belonds to
-  parent = d3.select("#" + d.Brain_Area).selectAll(".foreground").node();
+
   // Remove current line and reappend so that it appears on top
-  parent.removeChild(node);
+  var node = d3.select(this).node(),
+  parent = d3.select("#" + d.Brain_Area).selectAll(".foreground").node();
+
   parent.appendChild(node);
 
+  // Pop up tooltip
   toolTip
      .style("opacity", .9)
-     .style("left", (d3.event.pageX + 30) + "px")
+     .style("left", (d3.event.pageX + 40) + "px")
      .style("top", (d3.event.pageY - 80) + "px")
      .html(function() {
        return  d.Brain_Area + " Neuron " + d.Wire_Number + "." + d.Unit_Number + "<br>" +
