@@ -34,7 +34,7 @@ d3.csv("DATA/" + timePeriod + " apc.csv", function(error, data) {
 
   // Exclude neurons less than 1 Hz
   data = data.filter(function(d) {
-    return +d["Average_Firing_Rate"] >= 2;
+    return +d["Average_Firing_Rate"] >= 1;
   })
 
   // Reverse dimension order for better understandability.
@@ -249,8 +249,15 @@ function fixDimNames(dim_name) {
 }
 // On mouseover, highlight line, pop up tooltip
 function mouseover(d) {
-  
+
   d3.select(this).classed("active", true);
+  // Select current line
+  var node = d3.select(this).node(),
+  // Find group line belonds to
+  parent = d3.select("#" + d.Brain_Area).selectAll(".foreground").node();
+  // Remove current line and reappend so that it appears on top
+  parent.removeChild(node);
+  parent.appendChild(node);
 
   toolTip
      .style("opacity", .9)
