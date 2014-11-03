@@ -1,22 +1,25 @@
+// Set svg sizing and margins
 var margin = {top: 30, right: 10, bottom: 10, left: 150},
 width = 500 - margin.left - margin.right,
 height = 500 - margin.top - margin.bottom;
 
+// Preallocate scales, data, and lines;
 var yScale = d3.scale.ordinal().rangePoints([height, 0], 1),
 xScale = {};
 
 var data = {};
 
 var line = d3.svg.line(),
-axis = d3.svg.axis().orient("left"),
+axis = d3.svg.axis(),
 background,
 foreground;
 
-// Tool Tip
+// Tool Tip - make a hidden div to appear as a tooltip when mousing over a line
 var toolTip = d3.select("body").append("div")
     .attr("class", "tooltip")
     .style("opacity", 0);
 
+// Formatting function for digits
 var formatting = d3.format(".3n");
 
 // Load Data
@@ -53,6 +56,7 @@ d3.csv("DATA/" + timePeriod + " apc.csv", function(error, data) {
     return d3.max(data, function(neuron) { return +neuron[dim]; });
   }));
 
+  // Make the max and min of the scale symmetric
   if (Math.abs(xMin) > Math.abs(xMax)) {
     xMax = Math.abs(xMin);
   } else if (Math.abs(xMin) < Math.abs(xMax)) {
@@ -69,7 +73,8 @@ d3.csv("DATA/" + timePeriod + " apc.csv", function(error, data) {
     .key(function(d) { return d["Brain_Area"]; })
     .entries(data);
 
-  firingRate_scale = neurons.map(function(brain_area) {
+  // Different scale for average firing rate
+  avgRate_scale = neurons.map(function(brain_area) {
     return d3.scale.linear().domain(firingRate_extent).range([0, width]);
   });
 
@@ -83,7 +88,7 @@ d3.csv("DATA/" + timePeriod + " apc.csv", function(error, data) {
   // Add average firing rate to beginning of dimensions array
   dimensions.unshift("Average_Firing_Rate");
   xScale.map(function(brain_area_dim, ind) {
-    brain_area_dim.unshift(firingRate_scale[ind]);
+    brain_area_dim.unshift(avgRate_scale[ind]);
   });
 
   // Set yScale domain
@@ -117,23 +122,23 @@ function drawParallel() {
 
   // Add grey background lines for context.
   background = svg.append("g")
-  .attr("class", "background")
-  .selectAll("path")
-  .data(function(d) {return d.values;})
-  .enter().append("path")
-  .attr("d", path);
+    .attr("class", "background")
+    .selectAll("path")
+    .data(function(d) {return d.values;})
+    .enter().append("path")
+    .attr("d", path);
 
   // Add a group element for each dimension.
   var g = svg.selectAll(".dimension")
-  .data(dimensions)
-  .enter().append("g")
-  .attr("class", "dimension")
-  .attr("transform", function(d) { return "translate(0," + yScale(d) + ")"; });
+    .data(dimensions)
+    .enter().append("g")
+    .attr("class", "dimension")
+    .attr("transform", function(d) { return "translate(0," + yScale(d) + ")"; });
 
   // Add an axis and title.
   g.append("g")
-  .attr("class", "grid")
-  .style("stroke-dasharray", ("3, 3"))
+    .attr("class", "grid")
+    .style("stroke-dasharray", ("3, 3"))
       .each(function(dim, dim_ind, div_ind) {
           d3.select(this).call(makeXAxis(dim, dim_ind, div_ind));
         })
@@ -145,23 +150,23 @@ function drawParallel() {
 
   //Add and store a brush for each axis.
   g.append("g")
-  .attr("class", "brush")
-  .each(function(dim, dim_ind, div_ind) {
-    d3.select(this).call(makeXBrush(dim, dim_ind, div_ind));
-  })
-  .selectAll("rect")
-  .attr("y", -8)
-  .attr("height", 16);
+    .attr("class", "brush")
+      .each(function(dim, dim_ind, div_ind) {
+        d3.select(this).call(makeXBrush(dim, dim_ind, div_ind));
+      })
+    .selectAll("rect")
+    .attr("y", -8)
+    .attr("height", 16);
 
   // Add blue foreground lines for focus.
   foreground = svg.append("g")
-  .attr("class", "foreground")
-  .selectAll("path")
-  .data(function(d) {return d.values;})
-  .enter().append("path")
-  .attr("d", path)
-  .on("mouseover", mouseover)
-  .on("mouseout", mouseout);
+    .attr("class", "foreground")
+    .selectAll("path")
+    .data(function(d) {return d.values;})
+    .enter().append("path")
+    .attr("d", path)
+    .on("mouseover", mouseover)
+    .on("mouseout", mouseout);
 
 }
 
@@ -174,10 +179,11 @@ function path(data_point, ind, div_ind) {
 
 // Handles a brush event, toggling the display of foreground lines.
 function brush() {
-
+  // On brush, fade tool tip
   toolTip
      .style("opacity", 1e-6);
 
+  // Get active dimension and their extents (min, max)
   var actives = dimensions.filter(function(dim, dim_ind) {
     return !xScale[0][dim_ind].brush.empty() || !xScale[1][dim_ind].brush.empty();
     }),
@@ -187,6 +193,7 @@ function brush() {
       return xScale[div_ind][dim_ind].brush.extent();
       })
     });
+  // Set foreground lines in the extent to "display" style, "none" if not
   foreground.style("display", function(neuron) {
     return actives.every(function(active_dim, extent_ind) {
       return ((extents[0][extent_ind][0] <= neuron[active_dim])
@@ -205,7 +212,7 @@ function makeXAxis(dim, dim_ind, div_ind) {
   newAxis = axis
     .scale(xScale[div_ind][dim_ind])
     .tickSize(0, 0, 0);
-
+  // Different axes for different dimensions
   switch(dim) {
     case "Rule":
       newAxis
@@ -222,7 +229,6 @@ function makeXAxis(dim, dim_ind, div_ind) {
         .orient("top")
         .ticks(0);
   }
-
 
   return newAxis;
 }
@@ -241,9 +247,9 @@ function fixDimNames(dim_name) {
 
   return fixed_name;
 }
-
+// On mouseover, highlight line, pop up tooltip
 function mouseover(d) {
-
+  
   d3.select(this).classed("active", true);
 
   toolTip
@@ -256,6 +262,7 @@ function mouseover(d) {
                "Avg. Firing: " + d.Average_Firing_Rate+ " Hz";
      });
 }
+// On mouseout, hide tooltip, un-highlight line
 function mouseout() {
 
   toolTip
