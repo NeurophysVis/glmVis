@@ -1,108 +1,27 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
-<style>
-body {
-  margin: 0 0;
-  width: 100%;
-  font-weight: normal;
-}
 
-svg {
-  font: 11px sans-serif;
-}
-
-.background path {
-  fill: none;
-  stroke: #ddd;
-  shape-rendering: crispEdges;
-}
-
-.active {
-  stroke-width: 2px;
-  stroke: black;
-}
-
-.foreground {
-  fill: none;
-  stroke: steelblue;
-  stroke-width: 1px;
-  opacity: 0.6;
-}
-
-.brush .extent {
-  stroke: #fff;
-  fill-opacity: .125;
-  shape-rendering: crispEdges;
-}
-
-.grid line, .axis line,
-.grid path, .axis path {
-  fill: none;
-  stroke: black;
-  stroke-width: 1px;
-  shape-rendering: crispEdges;
-  opacity: 0.1;
-}
-
-.grid text {
-  text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, -1px 0 0 #fff;
-}
-
-.axis line, .axis path {
-  opacity: 1.0;
-}
-
-.grid text {
-  font: 16px
-}
-
-.chart {
-  float: left;
-  padding-right: 1px;
-  padding-bottom: 1px;
-  padding-top:0;
-  padding-left:0;
-}
-
-div.tooltip {
-  position: absolute;
-  text-align: left;
-  width: 115px;
-  height: 45px;
-  padding: 10px 10px 2px 10px;
-  font: 11px sans-serif;
-  background: white;
-  border: 1px;
-  border-style: solid;
-  border-radius: 0px;
-  border-color: #808080;
-  pointer-events: none;
-}
-
-table{
- width: 100%;
- color: #000000;
-}
-
-th {
- font: 14px sans-serif;
- font-weight: bold;
-}
-
-td, tr {
- text-align:center;
-}
-
-hr {
- background-color: #808080;
- color: #808080;
- width: 100%;
-
-}
-
-</style>
 <body>
-  <div id="vis"> </div>
 <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 <script type="text/javascript" src="js/parallel-coord.js"></script>
+<div id="monkeySelector">
+  <a id="All" class="selected">All</a>
+  <a id="CC" class="">CC</a>
+  <a id="CH" class="">CH</a>
+  <a id="ISA" class="">ISA</a>
+</div>
+<div id="chart"> </div>
+
+<script>
+var cur_file = "Intertrial Interval apc";
+var params = {
+  data: cur_file,
+  width:500,
+  height:500
+};
+
+// Initialized visualization
+vis.init(params);
+</script>
+
 </body>
