@@ -19,7 +19,9 @@
 		height = innerHeight - padding.top - padding.bottom;
 
     chart.selectAll("svg")
-			.data([{width: width + margin.left + margin.right, height: height + margin.top + margin.bottom}])
+			.data([{
+        width: width + margin.left + margin.right,
+        height: height + margin.top + margin.bottom}])
 			.enter()
 			.append("svg");
 		svg = d3.select("svg").attr({
@@ -51,44 +53,23 @@
 			var cur_file_name = "/DATA/" + params.data + ".csv" + "#" + Math.random();
       // Load csv data
       d3.csv(cur_file_name, function(error, csv) {
-        // Preprocess the data
-        // Filter out sorting Variables
-        dimensions = d3.keys(csv[0]).filter(function(dim) {
-          var sortingVariables = ["Neurons", "Session_Name", "Wire_Number", "Unit_Number", "Brain_Area", "Monkey", "Average_Firing_Rate"];
-          return sortingVariables.indexOf(dim) == -1;
-        });
 
-        // Reverse dimension order for better understandability.
-        dimensions = dimensions.reverse();
-
-        // Formatting function for normalized firing rate
-        var formatting = d3.format(".3n");
-
-        // Normalize Firing Rates
-        csv.map(function(neuron, neuron_ind) {
-          dimensions.map(function(dim) {
-            csv[neuron_ind][dim] = formatting(100 * +neuron[dim]/+neuron["Average_Firing_Rate"]);
-          });
-        });
-
-        // Tool Tip - make a hidden div to appear as a tooltip when mousing over a line
-        toolTip = d3.select("body").append("div")
-            .attr("class", "tooltip")
-
-        vis.data = csv; // copy to globally accessible object
+        vis.data = preProcess(csv); // copy to globally accessible object
       	// Draw visualization
 				vis.draw(params);
       }); // end csv loading function
     }); // End load style function
   };
   vis.draw = function (params) {
-    var PLOT_BUFFER = 60; // Defines separation between plots
-        yScale = d3.scale.ordinal().rangePoints([height, 0], 1),
-        line = d3.svg.line(),
+    var line = d3.svg.line(),
         axis = d3.svg.axis(),
         background = [],
         foreground = [],
         curMonkey = d3.selectAll("#monkeySelector").selectAll(".selected").property("id");
+
+    // Tool Tip - make a hidden div to appear as a tooltip when mousing over a line
+    toolTip = d3.select("body").append("div")
+        .attr("class", "tooltip")
 
     // Exclude neurons less than 1 Hz or not corresponding to the selected monkey
     var neurons = vis.data.filter(function(d) {
@@ -96,33 +77,12 @@
       return (+d["Average_Firing_Rate"] >= 1) && isMonkey;
     });
 
-    // Set xScale domain and range by looping over each data dimension and getting its max and min
-    xMin = d3.min(dimensions.map(function(dim) {
-      return d3.min(neurons, function(neuron) { return +neuron[dim]; });
-    }));
-
-    xMax = d3.max(dimensions.map(function(dim) {
-      return d3.max(neurons, function(neuron) { return +neuron[dim]; });
-    }));
-
-    // Make the max and min of the scale symmetric
-    if (Math.abs(xMin) > Math.abs(xMax)) {
-      xMax = Math.abs(xMin);
-    } else if (Math.abs(xMin) < Math.abs(xMax)) {
-      xMin = -1 * Math.abs(xMax);
-    };
-
-    // Set xScale for each dimension
-    var xScale = dimensions.map(function(dim) {
-        return d3.scale.linear().domain([xMin, xMax]).range([0, (width - PLOT_BUFFER)/2]);
-      });
+    vis.Scales = setupScales(neurons)
 
     // Nest data by brain area
     neurons = d3.nest()
       .key(function(d) { return d["Brain_Area"]; })
       .entries(neurons);
-
-
 
     plot_g = svg.selectAll("g.plot_g").data(neurons, function(d) {return d.key;});
     plot_g
@@ -146,13 +106,6 @@ function drawParallel(brain_area) {
   // Join the trial data to svg containers ("g")
   var	brain_area_select = cur_plot.selectAll(".brain_area")
       .data(brain_area.values, function(d) {return d.Neurons; });
-
-  xScale.map(function(brain_area_dim, ind) {
-    brain_area_dim.unshift(avgRate_scale[ind]);
-  });
-
-  // Set yScale domain
-  yScale.domain(dimensions);
 
   div = d3.select("#vis").selectAll(".chart").data(neurons);
 
@@ -221,6 +174,68 @@ function drawParallel(brain_area) {
     .on("mouseover", mouseover)
     .on("mouseout", mouseout);
 
+}
+// Preprocess Data
+function preProcess(data) {
+
+  var sortingVariables = ["Neurons", "Session_Name", "Wire_Number", "Unit_Number", "Brain_Area", "Monkey", "Average_Firing_Rate"];
+  // Extract plot dimensions
+  var dimensions = d3.keys(data[0]).filter(function(dim) {
+    return sortingVariables.indexOf(dim) == -1;
+  });
+
+  // Reverse dimension order for better understandability.
+  dimensions = dimensions.reverse();
+
+  // Formatting function for normalized firing rate
+  var formatting = d3.format(".3n");
+
+  // Normalize Firing Rates
+  data.map(function(neuron, neuron_ind) {
+    dimensions.map(function(dim) {
+      data[neuron_ind][dim] = formatting(100 * +neuron[dim]/+neuron["Average_Firing_Rate"]);
+    });
+  });
+  // Make dimensions globablly accessible
+  vis.dimensions = dimensions;
+  return data;
+
+}
+
+// Set up Scales
+function setupScales(data) {
+  var PLOT_BUFFER = 60, // Defines separation between plots
+      xMin,
+      xMax,
+      xScale,
+      yScale;
+
+  // Set xScale domain and range by looping over each data dimension and getting its max and min
+  xMin = d3.min(vis.dimensions.map(function(dim) {
+    return d3.min(data, function(neuron) { return +neuron[dim]; });
+  }));
+
+  xMax = d3.max(vis.dimensions.map(function(dim) {
+    return d3.max(data, function(neuron) { return +neuron[dim]; });
+  }));
+
+  // Make the max and min of the scale symmetric
+  if (Math.abs(xMin) > Math.abs(xMax)) {
+    xMax = Math.abs(xMin);
+  } else if (Math.abs(xMin) < Math.abs(xMax)) {
+    xMin = -1 * Math.abs(xMax);
+  };
+
+  // Set xScale for each dimension
+  xScale = vis.dimensions.map(function(dim) {
+      return d3.scale.linear().domain([xMin, xMax]).range([0, (width - PLOT_BUFFER)/2]);
+    });
+
+  yScale = d3.scale.ordinal()
+    .domain(vis.dimensions)
+    .rangePoints([height, 0], 1);
+
+  return {xScale: xScale, yScale: yScale};
 }
 
 // Returns the path for a given data point.
