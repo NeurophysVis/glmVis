@@ -29,7 +29,8 @@
 			   height: function (d) {return d.height + margin.top + margin.bottom; }
 		  })
       .append("g")
-			.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+			.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+      .attr("id", "drawing_area");
 
     // vis.init can be re-ran to pass different height/width values
 		// to the svg. this doesn't create new svg elements.
@@ -92,7 +93,7 @@
         line = d3.svg.line(),
         axis = d3.svg.axis(),
         curMonkey = d3.selectAll("#monkeySelector").selectAll(".selected").property("id"),
-        xScale, yScale, plot_g;
+        xScale, yScale, plot_g, brushes;
 
     // Tool Tip - make a hidden div to appear as a tooltip when mousing over a line
     toolTip = d3.select("body").append("div")
@@ -112,15 +113,32 @@
       .key(function(d) { return d["Brain_Area"]; })
       .entries(neurons);
 
-    plot_g = svg.selectAll("g").data(neurons);
+    plot_g = svg.selectAll("g.brain_area").data(neurons);
     plot_g
 				.enter()
   				.append("g")
   				.attr("transform", function(d,i) {
                       return "translate(" + ((width/2) + PLOT_BUFFER)*i + ", 0)";
-                });
+                })
+          .attr("class", "brain_area")
+          .attr("id", function(d) {return d.key;})
+
+    brushes = vis.dimensions.map(function(dim, dim_ind) {return makeXBrush(dim, dim_ind)});
+
     plot_g
           .each(drawParallel);
+    // Set up brushes for dimensions
+    // d3.selectAll(".brain_area").selectAll(".dimension")
+    //   .append("g")
+    //     .attr("class", "brush")
+    //       .each(function(dim, dim_ind, div_ind) {
+    //         d3.select(this).call(makeXBrush(dim, dim_ind, div_ind));
+    //       })
+    //     .selectAll("rect")
+    //     .attr("y", -8)
+    //     .attr("height", 16);
+
+
 
       // Set up Scales
       function setupScales(data) {
@@ -187,8 +205,8 @@
         //Add and store a brush for each axis.
         dim_g.append("g")
           .attr("class", "brush")
-            .each(function(dim, dim_ind, div_ind) {
-              d3.select(this).call(makeXBrush(dim, dim_ind));
+            .each(function(dim, dim_ind) {
+              d3.select(this).call(brushes[dim_ind]);
             })
           .selectAll("rect")
           .attr("y", -8)
@@ -253,36 +271,29 @@
       function makeXBrush(dim, dim_ind) {
         var brush = d3.svg.brush()
           .x(xScale[dim_ind])
-          .on("brush", brush);
+          .on("brush", brushed);
         return brush;
       }
       // Handles a brush event, toggling the display of foreground lines.
-      function brush() {
+      function brushed() {
         // On brush, fade tool tip
         toolTip
            .style("opacity", 1e-6);
 
         // Get active dimension and their extents (min, max)
-        var actives = dimensions.filter(function(dim, dim_ind) {
-          return !xScale[dim_ind].brush.empty() || !xScale[dim_ind].brush.empty();
+        var actives = vis.dimensions.filter(function(dim, dim_ind) {
+          return !brushes[dim_ind].empty();
           }),
-        extents = neurons.map(function(neuron) {
-          return actives.map(function(dim) {
-            var dim_ind = dimensions.indexOf(dim);
-            return xScale[dim_ind].brush.extent();
-            })
+        extents = actives.map(function(dim) {
+            var dim_ind = vis.dimensions.indexOf(dim);
+            return brushes[dim_ind].extent();
           });
-        // Set foreground lines in the extent to "display" style, "none" if not
-        foreground.style("display", function(neuron) {
-          return actives.every(function(active_dim, extent_ind) {
-            return ((extents[0][extent_ind][0] <= neuron[active_dim])
-              && (neuron[active_dim] <= extents[0][extent_ind][1]))
-               ||
-              ((extents[1][extent_ind][0] <= neuron[active_dim])
-                && (neuron[active_dim] <= extents[1][extent_ind][1])
-            );
-          }) ? null : "none";
-        });
+
+        d3.selectAll(".foreground").selectAll("path").style("display", function(neuron){
+            return actives.every(function(active_dim, active_ind) {
+              return extents[active_ind][0] <= neuron[active_dim] && neuron[active_dim] <= extents[active_ind][1];
+              }) ? null : "none";
+            });
       }
       // On mouseover, highlight line, pop up tooltip
       function mouseover(d) {
@@ -308,7 +319,6 @@
       }
       // On mouseout, hide tooltip, un-highlight line
       function mouseout() {
-
         toolTip
            .style("opacity", 1e-6);
         d3.select(this).classed("active", false);
