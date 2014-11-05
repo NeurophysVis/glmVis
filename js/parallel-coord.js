@@ -91,8 +91,6 @@
     var PLOT_BUFFER = 60,
         line = d3.svg.line(),
         axis = d3.svg.axis(),
-        background = [],
-        foreground = [],
         curMonkey = d3.selectAll("#monkeySelector").selectAll(".selected").property("id"),
         xScale, yScale, plot_g;
 
@@ -114,15 +112,15 @@
       .key(function(d) { return d["Brain_Area"]; })
       .entries(neurons);
 
-    plot_g = svg.selectAll("g.plot_g").data(neurons);
+    plot_g = svg.selectAll("g").data(neurons);
     plot_g
 				.enter()
   				.append("g")
   				.attr("transform", function(d,i) {
                       return "translate(" + ((width/2) + PLOT_BUFFER)*i + ", 0)";
-                })
-          .style("class", "plot_g")
-          .each(drawParallel());
+                });
+    plot_g
+          .each(drawParallel);
 
       // Set up Scales
       function setupScales(data) {
@@ -157,31 +155,9 @@
       function drawParallel(brain_area) {
 
         var cur_plot = d3.select(this);
-        // Join the trial data to svg containers ("g")
-        var	brain_area_select = cur_plot.selectAll(".brain_area")
-            .data(brain_area.values, function(d) {return d.Neurons; });
-
-        div = d3.select("#vis").selectAll(".chart").data(neurons);
-
-        div.enter().append("div")
-          .attr("class", "chart")
-          .attr("id", function(d) {return d.key;})
-          .append("svg");
-
-        svg = div.select("svg")
-            .attr("width", width + margin.left + margin.right )
-            .attr("height", height + margin.top + margin.bottom )
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-        svg.append("text")
-              .attr("x", (width / 2))
-              .attr("y", 0 - (margin.top / 2))
-              .attr("text-anchor", "middle")
-              .style("font-size", "16px")
-              .text(function(d) {return d.key;});
 
         // Add grey background lines for context.
-        background = svg.append("g")
+        cur_plot.append("g")
           .attr("class", "background")
           .selectAll("path")
           .data(function(d) {return d.values;})
@@ -189,18 +165,18 @@
           .attr("d", path);
 
         // Add a group element for each dimension.
-        var g = svg.selectAll(".dimension")
-          .data(dimensions)
+        var dim_g = cur_plot.selectAll(".dimension")
+          .data(vis.dimensions)
           .enter().append("g")
           .attr("class", "dimension")
           .attr("transform", function(d) { return "translate(0," + yScale(d) + ")"; });
 
         // Add an axis and title.
-        g.append("g")
+        dim_g.append("g")
           .attr("class", "grid")
           .style("stroke-dasharray", ("3, 3"))
-            .each(function(dim, dim_ind, div_ind) {
-                d3.select(this).call(makeXAxis(dim, dim_ind, div_ind));
+            .each(function(dim, dim_ind) {
+                d3.select(this).call(makeXAxis(dim, dim_ind));
               })
           .append("text")
             .style("text-anchor", "end")
@@ -209,17 +185,17 @@
             .text(function(dim) { return fixDimNames(dim); });
 
         //Add and store a brush for each axis.
-        g.append("g")
+        dim_g.append("g")
           .attr("class", "brush")
             .each(function(dim, dim_ind, div_ind) {
-              d3.select(this).call(makeXBrush(dim, dim_ind, div_ind));
+              d3.select(this).call(makeXBrush(dim, dim_ind));
             })
           .selectAll("rect")
           .attr("y", -8)
           .attr("height", 16);
 
         // Add blue foreground lines for focus.
-        foreground = svg.append("g")
+        cur_plot.append("g")
           .attr("class", "foreground")
           .selectAll("path")
           .data(function(d) {return d.values;})
@@ -230,51 +206,18 @@
 
       }
 
-
-
-
       // Returns the path for a given data point.
-      function path(data_point, ind, div_ind) {
-        return line(dimensions.map(function(dim, dim_ind) {
-          return [xScale[div_ind][dim_ind](data_point[dim]), yScale(dim)];
+      function path(data_point) {
+        return line(vis.dimensions.map(function(dim, dim_ind) {
+          return [xScale[dim_ind](data_point[dim]), yScale(dim)];
         }));
       }
-
-      // Handles a brush event, toggling the display of foreground lines.
-      function brush() {
-
-        // On brush, fade tool tip
-        toolTip
-           .style("opacity", 1e-6);
-
-        // Get active dimension and their extents (min, max)
-        var actives = dimensions.filter(function(dim, dim_ind) {
-          return !xScale[0][dim_ind].brush.empty() || !xScale[1][dim_ind].brush.empty();
-          }),
-        extents = neurons.map(function(neuron, div_ind) {
-          return actives.map(function(dim) {
-            var dim_ind = dimensions.indexOf(dim);
-            return xScale[div_ind][dim_ind].brush.extent();
-            })
-          });
-        // Set foreground lines in the extent to "display" style, "none" if not
-        foreground.style("display", function(neuron) {
-          return actives.every(function(active_dim, extent_ind) {
-            return ((extents[0][extent_ind][0] <= neuron[active_dim])
-              && (neuron[active_dim] <= extents[0][extent_ind][1]))
-               ||
-              ((extents[1][extent_ind][0] <= neuron[active_dim])
-                && (neuron[active_dim] <= extents[1][extent_ind][1])
-            );
-          }) ? null : "none";
-        });
-      }
       // Creates the x-axis for a given dimension
-      function makeXAxis(dim, dim_ind, div_ind) {
+      function makeXAxis(dim, dim_ind) {
         var newAxis;
 
         newAxis = axis
-          .scale(xScale[div_ind][dim_ind])
+          .scale(xScale[dim_ind])
           .tickSize(0, 0, 0);
         // Different axes for different dimensions
         switch(dim) {
@@ -296,13 +239,6 @@
 
         return newAxis;
       }
-      // Creates a brush object for a given dimension
-      function makeXBrush(dim, dim_ind, div_ind) {
-        xScale[div_ind][dim_ind].brush = d3.svg.brush()
-          .x(xScale[div_ind][dim_ind])
-          .on("brush", brush);
-        return xScale[div_ind][dim_ind].brush;
-      }
       // Replaces underscores with blanks and "plus" with "+"
       function fixDimNames(dim_name) {
         var pat1 = /plus/,
@@ -313,6 +249,41 @@
 
         return fixed_name;
       }
+      // Creates a brush object for a given dimension
+      function makeXBrush(dim, dim_ind) {
+        var brush = d3.svg.brush()
+          .x(xScale[dim_ind])
+          .on("brush", brush);
+        return brush;
+      }
+      // Handles a brush event, toggling the display of foreground lines.
+      function brush() {
+        // On brush, fade tool tip
+        toolTip
+           .style("opacity", 1e-6);
+
+        // Get active dimension and their extents (min, max)
+        var actives = dimensions.filter(function(dim, dim_ind) {
+          return !xScale[dim_ind].brush.empty() || !xScale[dim_ind].brush.empty();
+          }),
+        extents = neurons.map(function(neuron) {
+          return actives.map(function(dim) {
+            var dim_ind = dimensions.indexOf(dim);
+            return xScale[dim_ind].brush.extent();
+            })
+          });
+        // Set foreground lines in the extent to "display" style, "none" if not
+        foreground.style("display", function(neuron) {
+          return actives.every(function(active_dim, extent_ind) {
+            return ((extents[0][extent_ind][0] <= neuron[active_dim])
+              && (neuron[active_dim] <= extents[0][extent_ind][1]))
+               ||
+              ((extents[1][extent_ind][0] <= neuron[active_dim])
+                && (neuron[active_dim] <= extents[1][extent_ind][1])
+            );
+          }) ? null : "none";
+        });
+      }
       // On mouseover, highlight line, pop up tooltip
       function mouseover(d) {
         // Highlight line by increasing width and changing its color
@@ -320,7 +291,7 @@
 
         // Remove current line and reappend so that it appears on top
         var node = d3.select(this).node(),
-        parent = d3.select("#" + d.Brain_Area).selectAll(".foreground").node();
+        parent = node.parentNode;
 
         parent.appendChild(node);
 
