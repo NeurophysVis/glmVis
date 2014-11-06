@@ -113,6 +113,7 @@
     // Nest data by brain area
     neurons = d3.nest()
       .key(function(d) { return d["Brain_Area"]; })
+      .sortKeys(d3.ascending)
       .entries(neurons);
 
     // Create brushes for all the dimensions
