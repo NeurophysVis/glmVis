@@ -209,6 +209,14 @@
           .attr("d", path)
           .on("mouseover", mouseover)
           .on("mouseout", mouseout);
+
+        // Title
+        cur_plot.append("text")
+        .attr("x", ((width)/4) - 20)
+        .attr("y", -15)
+        .attr("text-anchor", "middle")
+        .style("font-size", "16px")
+        .text(function(d) {return d.key;});
       }
       // Returns the path for a given data point.
       function path(data_point) {
@@ -228,7 +236,8 @@
           case "Rule":
             newAxis
               .orient("top")
-              .ticks(5);
+              .ticks(5)
+              .tickSize(5, 0, 0);
             break;
           default:
             newAxis
