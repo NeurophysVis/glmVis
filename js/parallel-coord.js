@@ -192,7 +192,8 @@
           .selectAll("path")
           .data(brain_area.values, function(d) {return d.Neurons;});
         back_lines
-          .enter().append("path")
+          .enter().append("path");
+        back_lines
           .attr("d", path);
         back_lines
           .exit().remove();
@@ -239,14 +240,11 @@
         fore_lines = foreground.selectAll("path")
           .data(brain_area.values, function(d) {return d.Neurons;});
         fore_lines
-          .enter().append("path")
+          .enter().append("path");
+        fore_lines
           .attr("d", path)
           .on("mouseover", mouseover)
           .on("mouseout", mouseout);
-        fore_lines
-           .transition()
-            .duration(10)
-            .ease("linear");
         fore_lines.exit().remove();
 
         // Title
