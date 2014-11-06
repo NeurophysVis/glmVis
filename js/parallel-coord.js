@@ -127,18 +127,6 @@
 
     plot_g
           .each(drawParallel);
-    // Set up brushes for dimensions
-    // d3.selectAll(".brain_area").selectAll(".dimension")
-    //   .append("g")
-    //     .attr("class", "brush")
-    //       .each(function(dim, dim_ind, div_ind) {
-    //         d3.select(this).call(makeXBrush(dim, dim_ind, div_ind));
-    //       })
-    //     .selectAll("rect")
-    //     .attr("y", -8)
-    //     .attr("height", 16);
-
-
 
       // Set up Scales
       function setupScales(data) {
@@ -221,9 +209,7 @@
           .attr("d", path)
           .on("mouseover", mouseover)
           .on("mouseout", mouseout);
-
       }
-
       // Returns the path for a given data point.
       function path(data_point) {
         return line(vis.dimensions.map(function(dim, dim_ind) {
