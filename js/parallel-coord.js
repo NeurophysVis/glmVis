@@ -190,6 +190,7 @@
           .exit().remove();
 
         // Add a group element for each dimension.
+        // Remove prior axes
         dim_g = cur_plot.selectAll("g.dimension")
           .data(vis.dimensions);
         dim_g_Enter = dim_g
@@ -197,29 +198,29 @@
         dim_g_Enter
           .attr("class", "dimension")
           .attr("transform", function(d) { return "translate(0," + yScale(d) + ")"; });
+        // Append Axis for each dimension
         dim_g_Enter
-          .append("g") // Append Axis for each dimension
+          .append("g")
           .attr("class", "grid")
           .style("stroke-dasharray", ("3, 3"))
-            .each(function(dim, dim_ind) {
-                d3.select(this).call(makeXAxis(dim, dim_ind));
-              })
           .append("text")
             .style("text-anchor", "end")
             .attr("x", -5)
             .attr("y", 3)
             .text(function(dim) { return fixDimNames(dim); });
+        cur_plot.selectAll("g.grid").each(function(dim, dim_ind) {
+            d3.select(this).call(makeXAxis(dim, dim_ind));
+          });
         //Add and store a brush for each axis.
         dim_g_Enter.append("g")
-          .attr("class", "brush")
-            .each(function(dim, dim_ind) {
-              d3.select(this).call(brushes[dim_ind]);
-            })
+          .attr("class", "brush");
+        cur_plot.selectAll("g.brush").each(function(dim, dim_ind) {
+            d3.select(this).call(brushes[dim_ind]);
+          })
           .selectAll("rect")
           .attr("y", -8)
           .attr("height", 16);
-        dim_g
-          .exit().remove();
+        dim_g.exit().remove();
 
         // Add blue foreground lines for focus.
         foreground = cur_plot.selectAll("g.foreground").data([{}]);
