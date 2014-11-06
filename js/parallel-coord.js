@@ -93,7 +93,8 @@
         line = d3.svg.line(),
         axis = d3.svg.axis(),
         curMonkey = d3.selectAll("#monkeySelector").selectAll(".selected").property("id"),
-        xScale, yScale, plot_g, brushes;
+        xScale, yScale, plot_g, brushes, slider, timePeriods, sliderScale, sliderBrush,
+        sliderHandle, sliderAxis;
 
     // Tool Tip - make a hidden div to appear as a tooltip when mousing over a line
     toolTip = d3.select("body").selectAll("div.tooltip").data([{}]);
@@ -130,12 +131,34 @@
 
     plot_g
           .each(drawParallel);
-
+    // Handle monkey button events
     d3.selectAll("#monkeySelector").selectAll("a").on("click", function() {
         d3.selectAll("#monkeySelector").selectAll("a").classed("selected", false);
         d3.select(this).classed("selected", true);
         vis.draw(params)
       });
+    // Slider for different time periods in trial
+    timePeriods = ["Intertrial Interval", "Fixation", "Rule Stimulus",
+                   "Stimulus Response", "Saccade", "Reward"];
+    sliderScale = d3.scale.ordinal()
+      .domain(timePeriods)
+      .rangePoints([0, width], 1);
+    sliderBrush = d3.svg.brush().x(sliderScale).extent([0, 0]).on("brush", sliderBrushed);
+    slider = svg.selectAll("g.slider").data([{}]);
+    slider.enter()
+      .append("g")
+      .attr("class", "slider")
+      .call(sliderBrush)
+        .append("circle")
+          .attr("class", "handle")
+          .attr("transform", "translate(0," + height + ")")
+          .attr("r", 9);
+    sliderAxis = svg.selectAll("g.sliderAxis").data([{}]);
+    sliderAxis.enter()
+      .append("g")
+      .attr("class", "sliderAxis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.svg.axis().scale(sliderScale).orient("bottom"));
 
       // Set up Scales
       function setupScales(data) {
@@ -345,6 +368,16 @@
         toolTip
            .style("opacity", 1e-6);
         d3.select(this).classed("active", false);
+      }
+      function sliderBrushed() {
+        var value = sliderBrush.extent()[0];
+
+        if (d3.event.sourceEvent) { // not a programmatic event
+          value = sliderScale.invert(d3.mouse(this)[0]);
+          sliderBrush.extent([value, value]);
+        }
+
+        d3.selectAll(".handle").attr("cx", sliderScale(value));
       }
   }
 
