@@ -96,7 +96,10 @@
         xScale, yScale, plot_g, brushes;
 
     // Tool Tip - make a hidden div to appear as a tooltip when mousing over a line
-    toolTip = d3.select("body").append("div")
+    toolTip = d3.select("body").selectAll("div.tooltip").data([{}]);
+    toolTip
+        .enter()
+        .append("div")
         .attr("class", "tooltip")
         .style("opacity", 1e-6);
     // Exclude neurons less than 1 Hz or not corresponding to the selected monkey
@@ -123,10 +126,16 @@
                       return "translate(" + ((width/2) + PLOT_BUFFER)*i + ", 0)";
                 })
           .attr("class", "brain_area")
-          .attr("id", function(d) {return d.key;})
+          .attr("id", function(d) {return d.key;});
 
     plot_g
           .each(drawParallel);
+
+    d3.selectAll("#monkeySelector").selectAll("a").on("click", function() {
+        d3.selectAll("#monkeySelector").selectAll("a").classed("selected", false);
+        d3.select(this).classed("selected", true);
+        vis.draw(params)
+      });
 
       // Set up Scales
       function setupScales(data) {
@@ -161,24 +170,35 @@
       function drawParallel(brain_area) {
 
         var cur_plot = d3.select(this);
+        var foreground, background, dim_g, dim_g_Enter,
+        back_lines, fore_lines, title;
 
         // Add grey background lines for context.
-        cur_plot.append("g")
-          .attr("class", "background")
+        background = cur_plot.selectAll("g.background")
+          .data([{}]);
+        background
+          .enter()
+          .append("g")
+          .attr("class", "background");
+        back_lines = background
           .selectAll("path")
-          .data(function(d) {return d.values;})
+          .data(brain_area.values, function(d) {return d.Neurons;});
+        back_lines
           .enter().append("path")
           .attr("d", path);
+        back_lines
+          .exit().remove();
 
         // Add a group element for each dimension.
-        var dim_g = cur_plot.selectAll(".dimension")
-          .data(vis.dimensions)
-          .enter().append("g")
+        dim_g = cur_plot.selectAll("g.dimension")
+          .data(vis.dimensions);
+        dim_g_Enter = dim_g
+          .enter().append("g");
+        dim_g_Enter
           .attr("class", "dimension")
           .attr("transform", function(d) { return "translate(0," + yScale(d) + ")"; });
-
-        // Add an axis and title.
-        dim_g.append("g")
+        dim_g_Enter
+          .append("g") // Append Axis for each dimension
           .attr("class", "grid")
           .style("stroke-dasharray", ("3, 3"))
             .each(function(dim, dim_ind) {
@@ -189,9 +209,8 @@
             .attr("x", -5)
             .attr("y", 3)
             .text(function(dim) { return fixDimNames(dim); });
-
         //Add and store a brush for each axis.
-        dim_g.append("g")
+        dim_g_Enter.append("g")
           .attr("class", "brush")
             .each(function(dim, dim_ind) {
               d3.select(this).call(brushes[dim_ind]);
@@ -199,24 +218,36 @@
           .selectAll("rect")
           .attr("y", -8)
           .attr("height", 16);
+        dim_g
+          .exit().remove();
 
         // Add blue foreground lines for focus.
-        cur_plot.append("g")
-          .attr("class", "foreground")
-          .selectAll("path")
-          .data(function(d) {return d.values;})
+        foreground = cur_plot.selectAll("g.foreground").data([{}]);
+        foreground.enter()
+          .append("g")
+          .attr("class", "foreground");
+        fore_lines = foreground.selectAll("path")
+          .data(brain_area.values, function(d) {return d.Neurons;});
+        fore_lines
           .enter().append("path")
           .attr("d", path)
           .on("mouseover", mouseover)
           .on("mouseout", mouseout);
+        fore_lines
+          .transition()
+            .duration(10);
+        fore_lines.exit().remove();
 
         // Title
-        cur_plot.append("text")
-        .attr("x", ((width)/4) - 20)
-        .attr("y", -15)
-        .attr("text-anchor", "middle")
-        .style("font-size", "16px")
-        .text(function(d) {return d.key;});
+        title = cur_plot.selectAll("text.title").data([{}]);
+        title.enter()
+          .append("text")
+          .attr("class", "title")
+          .attr("x", ((width)/4) - 20)
+          .attr("y", -15)
+          .attr("text-anchor", "middle")
+          .style("font-size", "16px")
+          .text(brain_area.key);
       }
       // Returns the path for a given data point.
       function path(data_point) {
