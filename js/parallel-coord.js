@@ -79,7 +79,7 @@
       // Normalize Firing Rates
       data.map(function(neuron, neuron_ind) {
         dimensions.map(function(dim) {
-          data[neuron_ind][dim] = formatting(100 * +neuron[dim]/+neuron["Average_Firing_Rate"]);
+          data[neuron_ind][dim] = formatting(+neuron[dim]/+neuron["Average_Firing_Rate"]);
         });
       });
 
@@ -235,8 +235,9 @@
           .on("mouseover", mouseover)
           .on("mouseout", mouseout);
         fore_lines
-          .transition()
-            .duration(10);
+           .transition()
+            .duration(10)
+            .ease("linear");
         fore_lines.exit().remove();
 
         // Title
