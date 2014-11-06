@@ -89,7 +89,7 @@
     }
   };
   vis.draw = function (params) {
-    var PLOT_BUFFER = 60,
+    var PLOT_BUFFER = 80,
         line = d3.svg.line(),
         axis = d3.svg.axis(),
         curMonkey = d3.selectAll("#monkeySelector").selectAll(".selected").property("id"),
@@ -99,7 +99,6 @@
     toolTip = d3.select("body").append("div")
         .attr("class", "tooltip")
         .style("opacity", 1e-6);
-
     // Exclude neurons less than 1 Hz or not corresponding to the selected monkey
     var neurons = vis.data.filter(function(d) {
       var isMonkey = (d["Monkey"] == curMonkey) || (curMonkey == "All");
@@ -113,6 +112,9 @@
       .key(function(d) { return d["Brain_Area"]; })
       .entries(neurons);
 
+    // Create brushes for all the dimensions
+    brushes = vis.dimensions.map(function(dim, dim_ind) {return makeXBrush(dim, dim_ind)});
+
     plot_g = svg.selectAll("g.brain_area").data(neurons);
     plot_g
 				.enter()
@@ -122,8 +124,6 @@
                 })
           .attr("class", "brain_area")
           .attr("id", function(d) {return d.key;})
-
-    brushes = vis.dimensions.map(function(dim, dim_ind) {return makeXBrush(dim, dim_ind)});
 
     plot_g
           .each(drawParallel);
@@ -149,9 +149,9 @@
         };
 
         // Set xScale for each dimension
-        xScale = vis.dimensions.map(function(dim) {
-            return d3.scale.linear().domain([xMin, xMax]).range([0, (width - PLOT_BUFFER)/2]);
-          });
+        xScale = d3.scale.linear()
+          .domain([xMin, xMax])
+          .range([0, (width - PLOT_BUFFER)/2]);
 
         yScale = d3.scale.ordinal()
           .domain(vis.dimensions)
@@ -213,7 +213,7 @@
       // Returns the path for a given data point.
       function path(data_point) {
         return line(vis.dimensions.map(function(dim, dim_ind) {
-          return [xScale[dim_ind](data_point[dim]), yScale(dim)];
+          return [xScale(data_point[dim]), yScale(dim)];
         }));
       }
       // Creates the x-axis for a given dimension
@@ -221,18 +221,13 @@
         var newAxis;
 
         newAxis = axis
-          .scale(xScale[dim_ind])
+          .scale(xScale)
           .tickSize(0, 0, 0);
         // Different axes for different dimensions
         switch(dim) {
           case "Rule":
             newAxis
               .orient("top")
-              .ticks(3);
-            break;
-          case "Average_Firing_Rate":
-            newAxis
-              .orient("bottom")
               .ticks(5);
             break;
           default:
@@ -256,7 +251,7 @@
       // Creates a brush object for a given dimension
       function makeXBrush(dim, dim_ind) {
         var brush = d3.svg.brush()
-          .x(xScale[dim_ind])
+          .x(xScale)
           .on("brush", brushed);
         return brush;
       }
