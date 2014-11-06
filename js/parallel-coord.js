@@ -136,6 +136,13 @@
         d3.select(this).classed("selected", true);
         vis.draw(params)
       });
+    d3.selectAll("#intervalSelector").selectAll("a").on("click", function() {
+        d3.selectAll("#intervalSelector").selectAll("a").classed("selected", false);
+        d3.select(this).classed("selected", true);
+        curInterval = d3.select(this).property("id");
+        params.data = curInterval + " apc";
+        vis.loaddata(params);
+      });
 
       // Set up Scales
       function setupScales(data) {
@@ -189,8 +196,9 @@
         back_lines
           .exit().remove();
 
-        // Add a group element for each dimension.
         // Remove prior axes
+        cur_plot.selectAll("g.dimension").remove();
+        // Add a group element for each dimension.
         dim_g = cur_plot.selectAll("g.dimension")
           .data(vis.dimensions);
         dim_g_Enter = dim_g
