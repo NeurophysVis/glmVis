@@ -8,7 +8,7 @@
 
     if (!params) {params = {}; }
 		    chart = d3.select(params.chart || "#chart"); // placeholder div for svg
-    var margin = {top: 30, right: 10, bottom: 10, left: 150},
+    var margin = {top: 50, right: 10, bottom: 10, left: 150},
     	padding = {top: 60, right: 60, bottom: 60, left: 60};
 		var outerWidth = params.width || 960,
 			outerHeight = params.height || 500,
@@ -64,14 +64,17 @@
     // Preprocess Data
     function preProcess(data) {
 
-      var sortingVariables = ["Neurons", "Session_Name", "Wire_Number", "Unit_Number", "Brain_Area", "Monkey", "Average_Firing_Rate"];
+      var dimensionOrder = ["minus1_Std_Dev_of_Prep_Time","plus1_Std_Dev_of_Prep_Time",
+                            "Congruent","Incongruent",
+                            "Previous_Congruent","Previous_Incongruent",
+                            "Repetition11plus","Repetition10","Repetition9","Repetition8","Repetition7",
+                            "Repetition6","Repetition5","Repetition4","Repetition3","Repetition2","Repetition1",
+                            "No_Previous_Error","Previous_Error",
+                            "Rule"];
       // Extract plot dimensions
-      var dimensions = d3.keys(data[0]).filter(function(dim) {
-        return sortingVariables.indexOf(dim) == -1;
+      var dimensions = dimensionOrder.filter(function(dim) {
+        return d3.keys(data[0]).indexOf(dim) > -1;
       });
-
-      // Reverse dimension order for better understandability.
-      dimensions = dimensions.reverse();
 
       // Formatting function for normalized firing rate
       var formatting = d3.format(".3n");
@@ -253,10 +256,24 @@
           .append("text")
           .attr("class", "title")
           .attr("x", ((width)/4) - 20)
-          .attr("y", -15)
+          .attr("y", -20)
           .attr("text-anchor", "middle")
           .style("font-size", "16px")
           .text(brain_area.key);
+
+        // Axis with numbers
+        var solidAxis = cur_plot.selectAll("g.axis").data([{}]);
+        solidAxis.enter()
+          .append("g")
+          .attr("class", "axis")
+          .attr("transform", "translate(0,0)")
+        solidAxis
+		      .call(d3.svg.axis()
+	               .scale(xScale)
+	               .orient("top")
+                 .ticks(3)
+                 .tickSize(0, 0, 0)
+        );
       }
       // Returns the path for a given data point.
       function path(data_point) {
@@ -266,24 +283,11 @@
       }
       // Creates the x-axis for a given dimension
       function makeXAxis(dim, dim_ind) {
-        var newAxis;
-
-        newAxis = axis
+        var newAxis = axis
           .scale(xScale)
-          .tickSize(0, 0, 0);
-        // Different axes for different dimensions
-        switch(dim) {
-          case "Rule":
-            newAxis
-              .orient("top")
-              .ticks(5)
-              .tickSize(5, 0, 0);
-            break;
-          default:
-            newAxis
-              .orient("top")
-              .ticks(0);
-        }
+          .tickSize(0, 0, 0)
+          .orient("top")
+          .ticks(0);
 
         return newAxis;
       }
