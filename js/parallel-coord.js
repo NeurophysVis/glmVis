@@ -94,9 +94,8 @@
   vis.draw = function (params) {
     var PLOT_BUFFER = 80,
         line = d3.svg.line(),
-        axis = d3.svg.axis(),
         curMonkey = d3.selectAll("#monkeySelector").selectAll(".selected").property("id"),
-        xScale, yScale, plot_g, brushes;
+        xScale, yScale, plot_g, brushes = {};
 
     // Tool Tip - make a hidden div to appear as a tooltip when mousing over a line
     toolTip = d3.select("body").selectAll("div.tooltip").data([{}]);
@@ -120,7 +119,9 @@
       .entries(neurons);
 
     // Create brushes for all the dimensions
-    brushes = vis.dimensions.map(function(dim, dim_ind) {return makeXBrush(dim, dim_ind)});
+    vis.dimensions.map(function(dim) {brushes[dim] = d3.svg.brush()
+      .x(xScale)
+      .on("brush", brushed)});
 
     plot_g = svg.selectAll("g.brain_area").data(neurons);
     plot_g
@@ -181,7 +182,7 @@
       function drawParallel(brain_area) {
 
         var cur_plot = d3.select(this);
-        var foreground, background, dim_g, dim_g_Enter,
+        var foreground, background, dim_group, axis_group, brush_group,
         back_lines, fore_lines, title;
 
         // Add grey background lines for context.
@@ -195,24 +196,31 @@
           .selectAll("path")
           .data(brain_area.values, function(d) {return d.Neurons;});
         back_lines
+          .exit().remove();
+        back_lines
           .enter().append("path");
         back_lines
           .attr("d", path);
-        back_lines
-          .exit().remove();
 
-        // Remove prior axes
-        cur_plot.selectAll("g.dimension").remove();
         // Add a group element for each dimension.
-        dim_g = cur_plot.selectAll("g.dimension")
-          .data(vis.dimensions);
-        dim_g_Enter = dim_g
-          .enter().append("g");
-        dim_g_Enter
-          .attr("class", "dimension")
+        dims = cur_plot.selectAll("g.dimensions").data([{}]);
+        dims.enter().append("g").attr("class", "dimensions");
+        // Select dimensions group and bind to dimension data
+        dim_group = dims.selectAll("g.dimension")
+          .data(vis.dimensions, String);
+        // Remove dimension groups that don't currently exist
+        dim_group.exit().remove();
+        // Append group elements to new dimensions
+        dim_group
+          .enter().append("g")
+          .attr("class", "dimension");
+        // Translate each dimension group to its place on the yaxis
+        dim_group
           .attr("transform", function(d) { return "translate(0," + yScale(d) + ")"; });
-        // Append Axis for each dimension
-        dim_g_Enter
+        // Select axis and text for each dimension
+        axis_group = dim_group.selectAll("g.grid").data(function(d) {return [d];}, String);
+        // Append axis and text if it doesn't exist
+        axis_group.enter()
           .append("g")
           .attr("class", "grid")
           .style("stroke-dasharray", ("3, 3"))
@@ -221,19 +229,24 @@
             .attr("x", -5)
             .attr("y", 3)
             .text(function(dim) { return fixDimNames(dim); });
-        cur_plot.selectAll("g.grid").each(function(dim, dim_ind) {
-            d3.select(this).call(makeXAxis(dim, dim_ind));
+        // Call axis for each dimension
+        axis_group.each(function() {
+            d3.select(this).call(d3.svg.axis()
+              .scale(xScale)
+              .tickSize(0, 0, 0)
+              .orient("top")
+              .ticks(0));
           });
         //Add and store a brush for each axis.
-        dim_g_Enter.append("g")
+        brush_group = dim_group.selectAll("g.brush").data(function(d) {return [d];}, String);
+        brush_group.enter().append("g")
           .attr("class", "brush");
-        cur_plot.selectAll("g.brush").each(function(dim, dim_ind) {
-            d3.select(this).call(brushes[dim_ind]);
+        brush_group.each(function(dim) {
+            d3.select(this).call(brushes[dim]);
           })
           .selectAll("rect")
           .attr("y", -8)
           .attr("height", 16);
-        dim_g.exit().remove();
 
         // Add blue foreground lines for focus.
         foreground = cur_plot.selectAll("g.foreground").data([{}]);
@@ -242,13 +255,13 @@
           .attr("class", "foreground");
         fore_lines = foreground.selectAll("path")
           .data(brain_area.values, function(d) {return d.Neurons;});
+        fore_lines.exit().remove();
         fore_lines
           .enter().append("path");
         fore_lines
           .attr("d", path)
           .on("mouseover", mouseover)
           .on("mouseout", mouseout);
-        fore_lines.exit().remove();
 
         // Title
         title = cur_plot.selectAll("text.title").data([{}]);
@@ -271,7 +284,7 @@
 		      .call(d3.svg.axis()
 	               .scale(xScale)
 	               .orient("top")
-                 .ticks(3)
+                 .ticks(5)
                  .tickSize(0, 0, 0)
         );
       }
@@ -280,16 +293,6 @@
         return line(vis.dimensions.map(function(dim, dim_ind) {
           return [xScale(data_point[dim]), yScale(dim)];
         }));
-      }
-      // Creates the x-axis for a given dimension
-      function makeXAxis(dim, dim_ind) {
-        var newAxis = axis
-          .scale(xScale)
-          .tickSize(0, 0, 0)
-          .orient("top")
-          .ticks(0);
-
-        return newAxis;
       }
       // Replaces underscores with blanks and "plus" with "+"
       function fixDimNames(dim_name) {
@@ -301,13 +304,6 @@
 
         return fixed_name;
       }
-      // Creates a brush object for a given dimension
-      function makeXBrush(dim, dim_ind) {
-        var brush = d3.svg.brush()
-          .x(xScale)
-          .on("brush", brushed);
-        return brush;
-      }
       // Handles a brush event, toggling the display of foreground lines.
       function brushed() {
         // On brush, fade tool tip
@@ -315,12 +311,12 @@
            .style("opacity", 1e-6);
 
         // Get active dimension and their extents (min, max)
-        var actives = vis.dimensions.filter(function(dim, dim_ind) {
-          return !brushes[dim_ind].empty();
+        var actives = vis.dimensions.filter(function(dim) {
+          return !brushes[dim].empty();
           }),
         extents = actives.map(function(dim) {
             var dim_ind = vis.dimensions.indexOf(dim);
-            return brushes[dim_ind].extent();
+            return brushes[dim].extent();
           });
 
         d3.selectAll(".foreground").selectAll("path").style("display", function(neuron){
