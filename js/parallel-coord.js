@@ -315,7 +315,6 @@
           return !brushes[dim].empty();
           }),
         extents = actives.map(function(dim) {
-            var dim_ind = vis.dimensions.indexOf(dim);
             return brushes[dim].extent();
           });
 
