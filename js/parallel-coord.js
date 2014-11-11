@@ -188,35 +188,55 @@
         // Add grey background lines for context.
         background = cur_plot.selectAll("g.background")
           .data([{}]);
-        background
-          .enter()
+        background.enter()
           .append("g")
           .attr("class", "background");
         back_lines = background
           .selectAll("path")
           .data(brain_area.values, function(d) {return d.Neurons;});
+        back_lines.exit()
+          .transition()
+            .duration(10)
+            .ease("linear")
+          .remove();
+        back_lines.enter()
+          .append("path");
         back_lines
-          .exit().remove();
-        back_lines
-          .enter().append("path");
-        back_lines
+          .transition()
+            .duration(1000)
+            .delay(function(d, i) { return i; })
+            .ease("linear")
           .attr("d", path);
 
         // Add a group element for each dimension.
         dims = cur_plot.selectAll("g.dimensions").data([{}]);
-        dims.enter().append("g").attr("class", "dimensions");
+        dims.enter()
+          .append("g")
+          .attr("class", "dimensions");
         // Select dimensions group and bind to dimension data
         dim_group = dims.selectAll("g.dimension")
           .data(vis.dimensions, String);
         // Remove dimension groups that don't currently exist
-        dim_group.exit().remove();
+        dim_group.exit()
+          .transition()
+            .duration(100)
+          .style("opacity", 1E-6)
+          .remove();
         // Append group elements to new dimensions
-        dim_group
-          .enter().append("g")
-          .attr("class", "dimension");
+        dim_group.enter()
+          .append("g")
+          .attr("class", "dimension")
+          .style("opacity", 1E-6);
         // Translate each dimension group to its place on the yaxis
         dim_group
-          .attr("transform", function(d) { return "translate(0," + yScale(d) + ")"; });
+          .attr("transform", function(d) { return "translate(0," + yScale(d) + ")"; })
+          .transition()
+            .duration(100)
+            .delay(function(d, i) { return i; });
+        dim_group
+          .transition()
+            .duration(1000)
+            .style("opacity", 1);
         // Select axis and text for each dimension
         axis_group = dim_group.selectAll("g.grid").data(function(d) {return [d];}, String);
         // Append axis and text if it doesn't exist
@@ -239,7 +259,8 @@
           });
         //Add and store a brush for each axis.
         brush_group = dim_group.selectAll("g.brush").data(function(d) {return [d];}, String);
-        brush_group.enter().append("g")
+        brush_group.enter()
+          .append("g")
           .attr("class", "brush");
         brush_group.each(function(dim) {
             d3.select(this).call(brushes[dim]);
@@ -247,7 +268,6 @@
           .selectAll("rect")
           .attr("y", -8)
           .attr("height", 16);
-
         // Add blue foreground lines for focus.
         foreground = cur_plot.selectAll("g.foreground").data([{}]);
         foreground.enter()
@@ -255,14 +275,22 @@
           .attr("class", "foreground");
         fore_lines = foreground.selectAll("path")
           .data(brain_area.values, function(d) {return d.Neurons;});
-        fore_lines.exit().remove();
+        fore_lines.exit()
+          .transition()
+            .duration(10)
+            .ease("linear")
+          .remove();
+        fore_lines.enter()
+          .append("path");
         fore_lines
-          .enter().append("path");
+          .transition()
+            .duration(1000)
+            .delay(function(d, i) { return i; })
+            .ease("linear")
+          .attr("d", path);
         fore_lines
-          .attr("d", path)
           .on("mouseover", mouseover)
-          .on("mouseout", mouseout);
-
+          .on("mouseout", mouseout)
         // Title
         title = cur_plot.selectAll("text.title").data([{}]);
         title.enter()
@@ -273,7 +301,6 @@
           .attr("text-anchor", "middle")
           .style("font-size", "16px")
           .text(brain_area.key);
-
         // Axis with numbers
         var solidAxis = cur_plot.selectAll("g.axis").data([{}]);
         solidAxis.enter()
@@ -289,9 +316,9 @@
         );
       }
       // Returns the path for a given data point.
-      function path(data_point) {
-        return line(vis.dimensions.map(function(dim, dim_ind) {
-          return [xScale(data_point[dim]), yScale(dim)];
+      function path(neuron) {
+        return line(vis.dimensions.map(function(dim) {
+          return [xScale(+neuron[dim]), yScale(dim)];
         }));
       }
       // Replaces underscores with blanks and "plus" with "+"
@@ -299,9 +326,7 @@
         var pat1 = /plus/,
             pat2 = /_/g,
             pat3 = /minus/;
-
         var fixed_name = dim_name.replace(pat1, "+").replace(pat2, " ").replace(pat3, "-");
-
         return fixed_name;
       }
       // Handles a brush event, toggling the display of foreground lines.
@@ -309,7 +334,6 @@
         // On brush, fade tool tip
         toolTip
            .style("opacity", 1e-6);
-
         // Get active dimension and their extents (min, max)
         var actives = vis.dimensions.filter(function(dim) {
           return !brushes[dim].empty();
@@ -332,7 +356,6 @@
         // Remove current line and reappend so that it appears on top
         var node = d3.select(this).node(),
         parent = node.parentNode;
-
         parent.appendChild(node);
 
         // Pop up tooltip
