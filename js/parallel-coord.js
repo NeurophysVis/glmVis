@@ -77,12 +77,16 @@
       });
 
       // Formatting function for normalized firing rate
-      var formatting = d3.format(".3n");
+      var formatting = d3.format(".3g");
 
       // Normalize Firing Rates
       data.map(function(neuron, neuron_ind) {
         dimensions.map(function(dim) {
-          data[neuron_ind][dim] = formatting(+neuron[dim]/+neuron["Average_Firing_Rate"]);
+          var value = +neuron[dim]/+neuron["Average_Firing_Rate"];
+          if (Math.abs(value) < 1E-3 || Math.abs(value) === Infinity || isNaN(value)) {
+            value = 0.00;
+          }
+          data[neuron_ind][dim] = formatting(value);
         });
       });
 
