@@ -193,7 +193,7 @@
           .attr("class", "background");
         back_lines = background
           .selectAll("path")
-          .data(brain_area.values, function(d) {return d.Neurons;});
+          .data(brain_area.values, function(d) {return d.Name;});
         back_lines.exit()
           .transition()
             .duration(10)
@@ -274,7 +274,7 @@
           .append("g")
           .attr("class", "foreground");
         fore_lines = foreground.selectAll("path")
-          .data(brain_area.values, function(d) {return d.Neurons;});
+          .data(brain_area.values, function(d) {return d.Name;});
         fore_lines.exit()
           .transition()
             .duration(10)
