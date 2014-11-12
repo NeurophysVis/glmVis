@@ -107,7 +107,7 @@
     // Exclude neurons less than 1 Hz or not corresponding to the selected monkey
     var neurons = vis.data.filter(function(d) {
       var isMonkey = (d["Monkey"] == curMonkey) || (curMonkey == "All");
-      return (+d["Average_Firing_Rate"] >= 1) && isMonkey;
+      return isMonkey;
     });
 
     setupScales(neurons);
