@@ -295,6 +295,7 @@
         fore_lines
           .on("mouseover", mouseover)
           .on("mouseout", mouseout)
+          .on("click", mouseclick)
         // Title
         title = cur_plot.selectAll("text.title").data([{}]);
         title.enter()
@@ -378,6 +379,12 @@
         toolTip
            .style("opacity", 1e-6);
         d3.select(this).classed("active", false);
+      }
+      // On mouseclick
+      function mouseclick(d) {
+        d3.selectAll(".foreground").selectAll("path").style("display", function(neuron) {
+          return (d.Name == neuron.Name) ? null : "none";
+        })
       }
   }
 
