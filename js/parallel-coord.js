@@ -187,7 +187,7 @@
 
         var cur_plot = d3.select(this);
         var foreground, background, dim_group, axis_group, brush_group,
-        back_lines, fore_lines, title;
+        back_lines, fore_lines, title, zero_group, zero_line;
 
         // Add grey background lines for context.
         background = cur_plot.selectAll("g.background")
@@ -208,9 +208,27 @@
         back_lines
           .transition()
             .duration(1000)
-            .delay(function(d, i) { return i; })
+            .delay(200)
             .ease("linear")
           .attr("d", path);
+
+      zero_group = cur_plot.selectAll("g.plot_line").data([{}]);
+      zero_group.enter()
+        .append("g")
+        .attr("class", "plot_line");
+      zero_line = zero_group.selectAll("path").data([{}]);
+      zero_line.enter()
+        .append("path")
+        .attr("stroke", "black")
+        .attr("stroke-width", "1px")
+        .style("opacity", 0.7);
+      zero_line
+        .attr("d", function(d){
+          var line = d3.svg.line().x(xScale(0))
+            .y(function(z) {return z;});
+          return line([0, height])
+        });
+
 
         // Add a group element for each dimension.
         dims = cur_plot.selectAll("g.dimensions").data([{}]);
@@ -235,8 +253,7 @@
         dim_group
           .attr("transform", function(d) { return "translate(0," + yScale(d) + ")"; })
           .transition()
-            .duration(100)
-            .delay(function(d, i) { return i; });
+            .duration(100);
         dim_group
           .transition()
             .duration(1000)
