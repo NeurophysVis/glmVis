@@ -40,6 +40,16 @@
 		// this is where we can insert style that will affect the svg directly.
 		defs = svg.selectAll("defs").data([{}]).enter()
 			.append("defs");
+    // Create Marker for labeling
+    defs.append("marker")
+    .attr("id", "arrowhead")
+    .attr("refX", 0)
+    .attr("refY", 2)
+    .attr("markerWidth", 6)
+    .attr("markerHeight", 4)
+    .attr("orient", "auto")
+    .append("path")
+        .attr("d", "M 0,0 V 4 L6,2 Z");
 
     // Load Data
 		vis.loaddata(params);
@@ -187,7 +197,8 @@
 
         var cur_plot = d3.select(this);
         var foreground, background, dim_group, axis_group, brush_group,
-        back_lines, fore_lines, title, zero_group, zero_line;
+        back_lines, fore_lines, title, zero_group, zero_line,
+        arrow_data, arrow_line, arrow_group;
 
         // Add grey background lines for context.
         background = cur_plot.selectAll("g.background")
@@ -211,25 +222,22 @@
             .delay(200)
             .ease("linear")
           .attr("d", path);
-
+      // Line at Zero
+      zero_data = [
+        [[xScale(0), 0], [xScale(0), height]]
+      ];
       zero_group = cur_plot.selectAll("g.plot_line").data([{}]);
       zero_group.enter()
         .append("g")
         .attr("class", "plot_line");
-      zero_line = zero_group.selectAll("path").data([{}]);
+      zero_line = zero_group.selectAll("path").data(zero_data);
       zero_line.enter()
         .append("path")
         .attr("stroke", "black")
         .attr("stroke-width", "1px")
-        .style("opacity", 0.7);
+        .style("opacity", 0.9);
       zero_line
-        .attr("d", function(d){
-          var line = d3.svg.line().x(xScale(0))
-            .y(function(z) {return z;});
-          return line([0, height])
-        });
-
-
+        .attr("d", line);
         // Add a group element for each dimension.
         dims = cur_plot.selectAll("g.dimensions").data([{}]);
         dims.enter()
@@ -318,9 +326,9 @@
         title.enter()
           .append("text")
           .attr("class", "title")
-          .attr("x", ((width)/4) - 20)
+          .attr("x", -5)
           .attr("y", -20)
-          .attr("text-anchor", "middle")
+          .attr("text-anchor", "end")
           .style("font-size", "16px")
           .text(brain_area.key);
         // Axis with numbers
@@ -336,6 +344,27 @@
                  .ticks(5)
                  .tickSize(0, 0, 0)
         );
+        // Lines with arrows
+        arrow_data = [{
+          "Name": "Orientation",
+          "values": [[xScale(0) + 10, height], [xScale(0) + 50, height]]
+        },
+        {
+          "Name": "Color",
+          "values": [[xScale(0) - 10, height], [xScale(0) - 50, height]]
+        }];
+        arrow_group = cur_plot.selectAll("g.arrow_line").data([{}]);
+        arrow_group.enter()
+          .append("g")
+          .attr("class", "arrow_line");
+        arrow_line = arrow_group.selectAll("path").data(arrow_data);
+        arrow_enter = arrow_line.enter()
+          .append("path")
+            .attr("stroke", "black")
+            .attr("stroke-width", "1.5px")
+            .attr("marker-end", "url(#arrowhead)");
+        arrow_line
+          .attr("d", function(d) {return line(d.values);});
       }
       // Returns the path for a given data point.
       function path(neuron) {
