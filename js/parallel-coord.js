@@ -198,7 +198,7 @@
         var cur_plot = d3.select(this);
         var foreground, background, dim_group, axis_group, brush_group,
         back_lines, fore_lines, title, zero_group, zero_line,
-        arrow_data, arrow_line, arrow_group;
+        arrow_data, arrow_line, arrow_group, orient_label, color_label;
 
         // Add grey background lines for context.
         background = cur_plot.selectAll("g.background")
@@ -290,7 +290,7 @@
           .style("opacity", 1E-6)
           .transition()
             .duration(1000)
-            .style("opacity", 1);
+            .style("opacity", 0.6);
         fore_lines = foreground.selectAll("path")
           .data(brain_area.values, function(d) {return d.Name;});
         fore_lines.exit()
@@ -350,11 +350,11 @@
         // Lines with arrows
         arrow_data = [{
           "Name": "Orientation",
-          "values": [[xScale(0) + 10, height], [xScale(0) + 50, height]]
+          "values": [[xScale(0) + 10, -20], [xScale(0) + 50, -20]]
         },
         {
           "Name": "Color",
-          "values": [[xScale(0) - 10, height], [xScale(0) - 50, height]]
+          "values": [[xScale(0) - 10, -20], [xScale(0) - 50, -20]]
         }];
         arrow_group = cur_plot.selectAll("g.arrow_line").data([{}]);
         arrow_group.enter()
@@ -368,6 +368,27 @@
             .attr("marker-end", "url(#arrowhead)");
         arrow_line
           .attr("d", function(d) {return line(d.values);});
+        // Axis Labels
+        color_label = cur_plot.selectAll("text.color_label").data([{}]);
+        color_label.enter()
+          .append("text")
+            .attr("class", "color_label")
+            .attr("x", xScale(0) - 80)
+            .attr("y", -20)
+            .attr("dy", 3)
+            .attr("text-anchor", "middle")
+            .style("font-size", "12px")
+            .text("Color");
+        orient_label = cur_plot.selectAll("text.orient_label").data([{}]);
+        orient_label.enter()
+          .append("text")
+            .attr("class", "orient_label")
+            .attr("x", xScale(0) + 80)
+            .attr("y", -20)
+            .attr("dy", 3)
+            .attr("text-anchor", "middle")
+            .style("font-size", "12px")
+            .text("Orient");
       }
       // Returns the path for a given data point.
       function path(neuron) {
