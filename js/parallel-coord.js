@@ -216,12 +216,6 @@
           .remove();
         back_lines.enter()
           .append("path");
-        back_lines
-          .transition()
-            .duration(1000)
-            .delay(200)
-            .ease("linear")
-          .attr("d", path);
       // Line at Zero
       zero_data = [
         [[xScale(0), 0], [xScale(0), height]]
@@ -257,15 +251,6 @@
           .append("g")
           .attr("class", "dimension")
           .style("opacity", 1E-6);
-        // Translate each dimension group to its place on the yaxis
-        dim_group
-          .attr("transform", function(d) { return "translate(0," + yScale(d) + ")"; })
-          .transition()
-            .duration(100);
-        dim_group
-          .transition()
-            .duration(1000)
-            .style("opacity", 1);
         // Select axis and text for each dimension
         axis_group = dim_group.selectAll("g.grid").data(function(d) {return [d];}, String);
         // Append axis and text if it doesn't exist
@@ -311,12 +296,26 @@
           .remove();
         fore_lines.enter()
           .append("path");
-        fore_lines
+        // Transition back and fore lines at the same time to their current position
+        d3.transition()
+          .duration(1000)
+          .ease("quad")
+            .each(function(){
+              back_lines.transition()
+                .attr("d", path);
+              fore_lines.transition()
+                .attr("d", path);
+          })
           .transition()
-            .duration(1000)
-            .delay(function(d, i) { return i; })
-            .ease("linear")
-          .attr("d", path);
+            .duration(500)
+            .each(function(){
+              // Translate each dimension group to its place on the yaxis
+              dim_group
+                .transition()
+                .attr("transform", function(d) { return "translate(0," + yScale(d) + ")"; })
+                .transition()
+                  .style("opacity", 1);
+            })
         fore_lines
           .on("mouseover", mouseover)
           .on("mouseout", mouseout)
