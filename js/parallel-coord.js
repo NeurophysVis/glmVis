@@ -286,13 +286,17 @@
         foreground = cur_plot.selectAll("g.foreground").data([{}]);
         foreground.enter()
           .append("g")
-          .attr("class", "foreground");
+          .attr("class", "foreground")
+          .style("opacity", 1E-6)
+          .transition()
+            .duration(1000)
+            .style("opacity", 1);
         fore_lines = foreground.selectAll("path")
           .data(brain_area.values, function(d) {return d.Name;});
         fore_lines.exit()
           .transition()
-            .duration(10)
-            .ease("linear")
+            .duration(500)
+          .style("opacity", 1E-6)
           .remove();
         fore_lines.enter()
           .append("path");
