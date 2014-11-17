@@ -207,7 +207,7 @@
           .domain(vis.dimensions)
           .rangePoints([height, 0], 1);
 
-        dimColorScale = d3.scale.category10().domain(d3.values(vis.dimensionOrder));
+        dimColorScale = d3.scale.category10().domain(d3.values(vis.dimensionOrder).reverse());
       }
       // Draws parallel line plot
       function drawParallel(brain_area) {
