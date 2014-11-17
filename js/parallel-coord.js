@@ -355,7 +355,7 @@
 		      .call(d3.svg.axis()
 	               .scale(xScale)
 	               .orient("top")
-                 .ticks(5)
+                 .ticks(3)
                  .tickSize(0, 0, 0)
                );
         drawLabels();
