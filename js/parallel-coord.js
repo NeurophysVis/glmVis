@@ -74,15 +74,29 @@
     // Preprocess Data
     function preProcess(data) {
 
-      var dimensionOrder = ["minus1_Std_Dev_of_Prep_Time","plus1_Std_Dev_of_Prep_Time",
-                            "Congruent","Incongruent",
-                            "Previous_Congruent","Previous_Incongruent",
-                            "Repetition11plus","Repetition10","Repetition9","Repetition8","Repetition7",
-                            "Repetition6","Repetition5","Repetition4","Repetition3","Repetition2","Repetition1",
-                            "No_Previous_Error","Previous_Error",
-                            "Rule"];
+        var dimensionOrder = {minus1_Std_Dev_of_Prep_Time:"Normalized Prep Time",
+                            plus1_Std_Dev_of_Prep_Time:"Normalized Prep Time",
+                            Congruent:"Congruency History",
+                            Incongruent:"Congruency History",
+                            Previous_Congruent:"Congruency History",
+                            Previous_Incongruent:"Congruency History",
+                            Repetition11plus:"Switch History",
+                            Repetition11plus:"Switch History",
+                            Repetition10:"Switch History",
+                            Repetition9:"Switch History",
+                            Repetition8:"Switch History",
+                            Repetition7:"Switch History",
+                            Repetition6:"Switch History",
+                            Repetition5:"Switch History",
+                            Repetition4:"Switch History",
+                            Repetition3:"Switch History",
+                            Repetition2:"Switch History",
+                            Repetition1:"Switch History",
+                            No_Previous_Error:"Error History",
+                            Previous_Error:"Error History",
+                            Rule:"Rule"};
       // Extract plot dimensions
-      var dimensions = dimensionOrder.filter(function(dim) {
+      var dimensions = d3.keys(dimensionOrder).filter(function(dim) {
         return d3.keys(data[0]).indexOf(dim) > -1;
       });
 
@@ -101,6 +115,7 @@
       });
 
       vis.dimensions = dimensions;
+      vis.dimensionOrder = dimensionOrder;
       return data;
 
     }
@@ -192,7 +207,7 @@
           .domain(vis.dimensions)
           .rangePoints([height, 0], 1);
 
-        dimColorScale = d3.scale.category10();
+        dimColorScale = d3.scale.category10().domain(d3.values(vis.dimensionOrder));
       }
       // Draws parallel line plot
       function drawParallel(brain_area) {
@@ -267,7 +282,7 @@
             .attr("y", 3)
             .text(function(dim) { return fixDimNames(dim); })
             .style("fill", function(d) {
-                return dimColorScale(d);
+                return dimColorScale(vis.dimensionOrder[d]);
             });
         // Call axis for each dimension
         axis_group.each(function() {
