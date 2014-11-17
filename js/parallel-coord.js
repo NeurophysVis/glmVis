@@ -109,7 +109,7 @@
     var PLOT_BUFFER = 80,
         line = d3.svg.line(),
         curMonkey = d3.selectAll("#monkeySelector").selectAll(".selected").property("id"),
-        xScale, yScale, plot_g, brushes = {};
+        xScale, yScale, dimColorScale, plot_g, brushes = {};
 
     // Tool Tip - make a hidden div to appear as a tooltip when mousing over a line
     toolTip = d3.select("body").selectAll("div.tooltip").data([{}]);
@@ -191,6 +191,8 @@
         yScale = d3.scale.ordinal()
           .domain(vis.dimensions)
           .rangePoints([height, 0], 1);
+
+        dimColorScale = d3.scale.category10();
       }
       // Draws parallel line plot
       function drawParallel(brain_area) {
@@ -198,7 +200,8 @@
         var cur_plot = d3.select(this);
         var foreground, background, dim_group, axis_group, brush_group,
         back_lines, fore_lines, title, zero_group, zero_line,
-        arrow_data, arrow_line, arrow_group, orient_label, color_label;
+        arrow_data, arrow_line, arrow_group, arrow_enter, orient_label, color_label
+        ;
 
         // Add grey background lines for context.
         background = cur_plot.selectAll("g.background")
@@ -262,7 +265,10 @@
             .style("text-anchor", "end")
             .attr("x", -5)
             .attr("y", 3)
-            .text(function(dim) { return fixDimNames(dim); });
+            .text(function(dim) { return fixDimNames(dim); })
+            .style("fill", function(d) {
+                return dimColorScale(d);
+            });
         // Call axis for each dimension
         axis_group.each(function() {
             d3.select(this).call(d3.svg.axis()
@@ -316,24 +322,14 @@
               // Translate each dimension group to its place on the yaxis
               dim_group
                 .transition()
-                .attr("transform", function(d) { return "translate(0," + yScale(d) + ")"; })
+                  .attr("transform", function(d) {return "translate(0," + yScale(d) + ")";})
                 .transition()
                   .style("opacity", 1);
-            })
+            });
         fore_lines
           .on("mouseover", mouseover)
           .on("mouseout", mouseout)
           .on("click", mouseclick)
-        // Title
-        title = cur_plot.selectAll("text.title").data([{}]);
-        title.enter()
-          .append("text")
-          .attr("class", "title")
-          .attr("x", -5)
-          .attr("y", -20)
-          .attr("text-anchor", "end")
-          .style("font-size", "16px")
-          .text(brain_area.key);
         // Axis with numbers
         var solidAxis = cur_plot.selectAll("g.axis").data([{}]);
         solidAxis.enter()
@@ -346,49 +342,63 @@
 	               .orient("top")
                  .ticks(5)
                  .tickSize(0, 0, 0)
-        );
-        // Lines with arrows
-        arrow_data = [{
-          "Name": "Orientation",
-          "values": [[xScale(0) + 10, -20], [xScale(0) + 50, -20]]
-        },
-        {
-          "Name": "Color",
-          "values": [[xScale(0) - 10, -20], [xScale(0) - 50, -20]]
-        }];
-        arrow_group = cur_plot.selectAll("g.arrow_line").data([{}]);
-        arrow_group.enter()
-          .append("g")
-          .attr("class", "arrow_line");
-        arrow_line = arrow_group.selectAll("path").data(arrow_data);
-        arrow_enter = arrow_line.enter()
-          .append("path")
-            .attr("stroke", "black")
-            .attr("stroke-width", "1.5px")
-            .attr("marker-end", "url(#arrowhead)");
-        arrow_line
-          .attr("d", function(d) {return line(d.values);});
-        // Axis Labels
-        color_label = cur_plot.selectAll("text.color_label").data([{}]);
-        color_label.enter()
-          .append("text")
-            .attr("class", "color_label")
-            .attr("x", xScale(0) - 80 + "px")
-            .attr("y", -20 + "px")
-            .attr("dy", 3 + "px")
-            .attr("text-anchor", "middle")
-            .style("font-size", "12px")
-            .text("Color");
-        orient_label = cur_plot.selectAll("text.orient_label").data([{}]);
-        orient_label.enter()
-          .append("text")
-            .attr("class", "orient_label")
-            .attr("x", xScale(0) + 80 + "px")
-            .attr("y", -20 + "px")
-            .attr("dy", 3 + "px")
-            .attr("text-anchor", "middle")
-            .style("font-size", "12px")
-            .text("Orient");
+               );
+        drawLabels();
+        // Labels
+        function drawLabels() {
+          // Lines with arrows
+          arrow_data = [{
+            "Name": "Orient.",
+            "values": [[xScale(0) + 47, height], [xScale(0) + 75, height]]
+          },
+          {
+            "Name": "Color",
+            "values": [[xScale(0) - 45, height], [xScale(0) - 75, height]]
+          }];
+          arrow_group = cur_plot.selectAll("g.arrow_line").data([{}]);
+          arrow_group.enter()
+            .append("g")
+            .attr("class", "arrow_line");
+          arrow_line = arrow_group.selectAll("path").data(arrow_data);
+          arrow_enter = arrow_line.enter()
+            .append("path")
+              .attr("stroke", "black")
+              .attr("stroke-width", "1.5px")
+              .attr("marker-end", "url(#arrowhead)");
+          arrow_line
+            .attr("d", function(d) {return line(d.values);});
+          // Axis Labels
+          color_label = cur_plot.selectAll("text.color_label").data([{}]);
+          color_label.enter()
+            .append("text")
+              .attr("class", "color_label")
+              .attr("x", xScale(0) - 10 + "px")
+              .attr("y", height + "px")
+              .attr("dy", 3 + "px")
+              .attr("text-anchor", "end")
+              .style("font-size", "12px")
+              .text("Color");
+          orient_label = cur_plot.selectAll("text.orient_label").data([{}]);
+          orient_label.enter()
+            .append("text")
+              .attr("class", "orient_label")
+              .attr("x", xScale(0) + 10 + "px")
+              .attr("y", height + "px")
+              .attr("dy", 3 + "px")
+              .attr("text-anchor", "start")
+              .style("font-size", "12px")
+              .text("Orient.");
+          // Title
+          title = cur_plot.selectAll("text.title").data([{}]);
+          title.enter()
+            .append("text")
+            .attr("class", "title")
+            .attr("x", -5)
+            .attr("y", -20)
+            .attr("text-anchor", "end")
+            .style("font-size", "16px")
+            .text(brain_area.key);
+        }
       }
       // Returns the path for a given data point.
       function path(neuron) {
