@@ -9,7 +9,7 @@
     if (!params) {params = {}; }
 		    chart = d3.select(params.chart || "#chart"); // placeholder div for svg
     var margin = {top: 50, right: 10, bottom: 10, left: 150},
-    	padding = {top: 60, right: 60, bottom: 60, left: 60};
+    	padding = {top: 30, right: 30, bottom: 30, left: 30};
 		var outerWidth = params.width || 960,
 			outerHeight = params.height || 500,
 			innerWidth = outerWidth - margin.left - margin.right,
@@ -356,7 +356,7 @@
 	               .scale(xScale)
 	               .orient("top")
                  .ticks(3)
-                 .tickSize(0, 0, 0)
+                 .tickSize(3, 0, 0)
                );
         drawLabels();
         // Labels
@@ -408,9 +408,9 @@
           title.enter()
             .append("text")
             .attr("class", "title")
-            .attr("x", -5)
+            .attr("x", xScale(0))
             .attr("y", -20)
-            .attr("text-anchor", "end")
+            .attr("text-anchor", "middle")
             .style("font-size", "16px")
             .text(brain_area.key);
         }
