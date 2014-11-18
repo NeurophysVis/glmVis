@@ -9,7 +9,7 @@
     if (!params) {params = {}; }
 		    chart = d3.select(params.chart || "#chart"); // placeholder div for svg
     var margin = {top: 50, right: 10, bottom: 10, left: 150},
-    	padding = {top: 30, right: 30, bottom: 30, left: 30};
+    	padding = {top: 60, right: 60, bottom: 60, left: 60};
 		var outerWidth = params.width || 960,
 			outerHeight = params.height || 500,
 			innerWidth = outerWidth - margin.left - margin.right,
