@@ -34,7 +34,6 @@ svg {
 
 .grid line, .axis line,
 .grid path, .axis path {
-  fill: none;
   stroke: black;
   stroke-width: 1px;
   shape-rendering: crispEdges;
@@ -45,12 +44,26 @@ svg {
   text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, -1px 0 0 #fff;
 }
 
-.axis line, .axis path {
+.axis line, .axis path, .plot_line line, .plot_line path {
   opacity: 1.0;
+  stroke-width: 1px;
+  shape-rendering: crispEdges;
+  stroke: #000;
+}
+.axis text {
+  fill: #000;
 }
 
 .grid text {
-  font: 16px
+  font-size: 13px
+}
+
+.orient_label, .color_label{
+  fill: #000;
+}
+.arrow_line line, .arrow_line path, #arrowhead path {
+  fill: #000;
+  stroke: #000;
 }
 
 .chart {
@@ -59,6 +72,11 @@ svg {
   padding-bottom: 1px;
   padding-top:0;
   padding-left:0;
+}
+text.title {
+  font-size: 17px;
+  font-weight: bold;
+  margin-bottom: 0.6em;
 }
 
 div.tooltip {
