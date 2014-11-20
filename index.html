@@ -1,65 +1,69 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
+
 <head>
-  <meta charset="utf-8">
-  <title>Rule Preference</title>
-  <!-- Bootstrap -->
-  <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <meta charset="utf-8">
+    <title>Rule Preference</title>
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
 </head>
+
 <body role="document">
-  <div class="container">
-    <div class="row" role="navigation" data-spy="affix" data-offset-top="125" id="filterNav">
-      <input id="slider" type="range" step="1" max="5" min="0" value="0">
-      <div id="intervalSelector">
-        <div class="btn-group " role="group" aria-label="Time Interval">
-          <a id="Intertrial Interval" class="btn btn-default selected" role="button" href="#">Intertrial Interval</a>
-          <a id="Fixation" class="btn btn-default" role="button" href="#">Fixation</a>
-          <a id="Rule Stimulus" class="btn btn-default" role="button" href="#">Rule Stimulus</a>
-          <a id="Stimulus Response" class="btn btn-default" role="button" href="#">Stimulus Response</a>
-          <a id="Saccade" class="btn btn-default" role="button" href="#">Saccade</a>
-          <a id="Reward" class="btn btn-default" role="button" href="#">Reward</a>
+    <div class="container">
+        <div class="row" role="navigation" data-spy="affix" data-offset-top="125" id="filterNav">
+            <input id="slider" type="range" step="1" max="5" min="0" value="0">
+            <div id="intervalSelector">
+                <div class="btn-group " role="group" aria-label="Time Interval">
+                    <a id="Intertrial Interval" class="btn btn-default selected" role="button" href="#">Intertrial Interval</a>
+                    <a id="Fixation" class="btn btn-default" role="button" href="#">Fixation</a>
+                    <a id="Rule Stimulus" class="btn btn-default" role="button" href="#">Rule Stimulus</a>
+                    <a id="Stimulus Response" class="btn btn-default" role="button" href="#">Stimulus Response</a>
+                    <a id="Saccade" class="btn btn-default" role="button" href="#">Saccade</a>
+                    <a id="Reward" class="btn btn-default" role="button" href="#">Reward</a>
+                </div>
+            </div>
+            <div id="monkeySelector">
+                <div class="btn-group" role="group" aria-label="Monkey">
+                    <a id="All" class="btn btn-default selected" role="button" href="#">All Monkeys</a>
+                    <a id="ISA" class="btn btn-default" role="button" href="#">Monkey ISA</a>
+                    <a id="CC" class="btn btn-default" role="button" href="#">Monkey CC</a>
+                    <a id="CH" class="btn btn-default" role="button" href="#">Monkey CH</a>
+                </div>
+            </div>
         </div>
-      </div>
-      <div id="monkeySelector">
-        <div class="btn-group" role="group" aria-label="Monkey">
-          <a id="All" class="btn btn-default selected" role="button" href="#">All Monkeys</a>
-          <a id="ISA" class="btn btn-default" role="button" href="#">Monkey ISA</a>
-          <a id="CC" class="btn btn-default" role="button" href="#">Monkey CC</a>
-          <a id="CH" class="btn btn-default" role="button" href="#">Monkey CH</a>
+        <div class="page-header">
         </div>
-      </div>
+        <div class="row">
+            <div id="chart"> </div>
+        </div>
+        <div class="row">
+            <p id="figure-3" class="col-md-8">Figure 3: <strong> Rule Preference by Brain Area and
+        Condition </strong> Normalized difference in firing rate between the orientation
+                rule and color rule at each condition. Each line represents a neuron.
+                The point at which the line intersects a particular axis (e.g. Repetition1)
+                is the normalized difference in firing rate in that condition.
+            </p>
+        </div>
     </div>
-    <div class="page-header">
     </div>
-    <div class="row">
-      <div id="chart"> </div>
-    </div>  <div class="row">
-      <p id="figure-3" class="col-md-8">Figure 3: <strong> Rule Preference by Brain Area and
-        Condition </strong> Normalized difference in firing rate between the
-        orientation rule and color rule at each condition. Each line represents
-        a neuron. The point at which the line intersects a particular axis (e.g. Repetition1)
-        is the normalized difference in firing rate in that condition.
-      </p>
-    </div>
-  </div>
-</div>
 
-<script src="http://d3js.org/d3.v3.min.js"></script>
-<script src="js/parallel-coord.js"></script>
-<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-<!-- Include all compiled plugins (below), or include individual files as needed -->
-<script src="js/bootstrap.min.js"></script>
-<script>
-var cur_file = "Intertrial Interval apc";
-var params = {
-  data: cur_file,
-  width:960,
-  height:500
-};
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="js/parallel-coord.js"></script>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="js/bootstrap.min.js"></script>
+    <script>
+        var cur_file =
+            "Intertrial Interval apc";
+        var params = {
+            data: cur_file,
+            width: 960,
+            height: 500
+        };
 
-// Initialized visualization
-vis.init(params);
-</script>
+        // Initialized visualization
+        vis.init(params);
+    </script>
 
 </body>
