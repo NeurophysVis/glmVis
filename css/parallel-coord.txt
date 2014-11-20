@@ -1,12 +1,24 @@
+
 body {
   margin: 0 0;
   width: 100%;
-  font-weight: normal;
+  @font-family-serif;
+  padding-top: 70px;
 }
 
 svg {
-  font: 11px sans-serif;
+  @font-family-serif;
 }
+
+#filterNav.affix {
+  position: fixed;
+  top: 0px;
+  width:100%;
+  background: #fff;
+  padding-bottom: 30px;
+}
+
+.bottom-buffer { margin-bottom:20px; }
 
 .background path {
   fill: none;
@@ -95,56 +107,52 @@ div.tooltip {
 }
 
 table{
- width: 100%;
- color: #000000;
+  width: 100%;
+  color: #000000;
 }
 
 th {
- font: 14px sans-serif;
- font-weight: bold;
+  font: 14px sans-serif;
+  font-weight: bold;
 }
 
 td, tr {
- text-align:center;
+  text-align:center;
 }
 
 hr {
- background-color: #808080;
- color: #808080;
- width: 100%;
+  background-color: #808080;
+  color: #808080;
+  width: 100%;
 
 }
 
-a {
-    background-color: #ddd;
-    color: #aaa;
-    display: block;
-    float: left;
-    position: relative;
-    text-align: center;
-    text-decoration: none;
-    width: 25%;
+#filterNav a.btn{
+  background: none repeat scroll 0 0 #fff;
+  border: 1px solid #ddd;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  color: #888;
 }
 
-a.selected {
-    background-color: #fff;
-    color: #000;
-    cursor: default;
-    font-size: 16px;
-    font-weight: 700;
+#filterNav a.selected {
+  background: none repeat scroll 0 0 #f0f0f0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) inset;
+  cursor: pointer;
+  font-weight: 600;
+  color: #222;
 }
-a:hover {
-    color: #006aad;
+#filterNav a:hover {
+  color: #006aad;
 }
 
-#monkeySelector {
-    border: 1px solid #999;
-    border-radius: 5px;
-    float: left;
-    font-size: 15px;
-    height: 25px;
-    line-height: 25px;
-    overflow: hidden;
-    position: relative;
-    width: 100px;
-}
+/*#monkeySelector {
+border: 1px solid #999;
+border-radius: 5px;
+float: left;
+font-size: 15px;
+height: 25px;
+line-height: 25px;
+overflow: hidden;
+position: relative;
+width: 100px;
+}*/
