@@ -145,14 +145,10 @@ hr {
   color: #006aad;
 }
 
-/*#monkeySelector {
-border: 1px solid #999;
-border-radius: 5px;
-float: left;
-font-size: 15px;
-height: 25px;
-line-height: 25px;
-overflow: hidden;
-position: relative;
-width: 100px;
-}*/
+#slider label {
+  position: absolute;
+  width: 20px;
+  margin-top: 20px;
+  margin-left: -10px;
+  text-align: center;
+}
