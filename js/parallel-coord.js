@@ -422,14 +422,14 @@
                     arrow_data = [{
                         "Name": "Orient.",
                         "values": [
-                            [xScale(0) + 47, height],
-                            [xScale(0) + 75, height]
+                            [xScale(0) + 100, height],
+                            [xScale(0) + 110, height]
                         ]
                     }, {
                         "Name": "Color",
                         "values": [
-                            [xScale(0) - 45, height],
-                            [xScale(0) - 75, height]
+                            [xScale(0) - 100, height],
+                            [xScale(0) - 110, height]
                         ]
                     }];
                     arrow_group = cur_plot.selectAll("g.arrow_line").data([{}]);
@@ -456,7 +456,16 @@
                         .attr("dy", 3 + "px")
                         .attr("text-anchor", "end")
                         .style("font-size", "12px")
-                        .text("Color");
+                        .text("Higher Firing for");
+                    color_label.enter()
+                        .append("text")
+                        .attr("class", "color_label")
+                        .attr("x", xScale(0) - 20 + "px")
+                        .attr("y", height + 10 + "px")
+                        .attr("dy", 3 + "px")
+                        .attr("text-anchor", "end")
+                        .style("font-size", "12px")
+                        .text("Color Rule");
                     orient_label = cur_plot.selectAll("text.orient_label").data([{}]);
                     orient_label.enter()
                         .append("text")
@@ -466,7 +475,16 @@
                         .attr("dy", 3 + "px")
                         .attr("text-anchor", "start")
                         .style("font-size", "12px")
-                        .text("Orient.");
+                        .text("Higher Firing for");
+                    orient_label.enter()
+                        .append("text")
+                        .attr("class", "orient_label")
+                        .attr("x", xScale(0) + 20 + "px")
+                        .attr("y", height + 10 + "px")
+                        .attr("dy", 3 + "px")
+                        .attr("text-anchor", "start")
+                        .style("font-size", "12px")
+                        .text("Orient. Rule");
                     // Title
                     title = cur_plot.selectAll("text.title").data([{}]);
                     title.enter()
