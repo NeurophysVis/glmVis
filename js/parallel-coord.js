@@ -154,7 +154,7 @@
         }
     };
     vis.draw = function(params) {
-        var PLOT_BUFFER = 80,
+        var PLOT_BUFFER = 100,
             line = d3.svg.line(),
             curMonkey = d3.selectAll("#monkeySelector").selectAll(".selected").property("id"),
             xScale, yScale, dimColorScale, plot_g, brushes = {};
@@ -258,7 +258,8 @@
                 var cur_plot = d3.select(this);
                 var foreground, background, dim_group, axis_group, brush_group,
                     back_lines, fore_lines, title, zero_group, zero_line,
-                    arrow_data, arrow_line, arrow_group, arrow_enter, orient_label, color_label;
+                    arrow_data, arrow_line, arrow_group, arrow_enter, orient_label,
+                    color_label, xAxis_label;
 
                 // Add grey background lines for context.
                 background = cur_plot.selectAll("g.background")
@@ -485,15 +486,24 @@
                         .attr("text-anchor", "start")
                         .style("font-size", "12px")
                         .text("Orient. Rule");
+                    xAxis_label = cur_plot.selectAll("text.xAxis_label").data([{}]);
+                    xAxis_label.enter()
+                      .append("text")
+                      .attr("class", "xAxis_label")
+                      .attr("x", xScale(0))
+                      .attr("y", -20)
+                      .attr("text-anchor", "middle")
+                      .text("Norm. Firing Rate");
+
                     // Title
                     title = cur_plot.selectAll("text.title").data([{}]);
                     title.enter()
                         .append("text")
                         .attr("class", "title")
                         .attr("x", xScale(0))
-                        .attr("y", -20)
+                        .attr("y", height + 50)
                         .attr("text-anchor", "middle")
-                        .style("font-size", "16px")
+                        .style("font-size", "28px")
                         .text(brain_area.key);
                 }
             }
