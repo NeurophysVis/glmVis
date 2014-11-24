@@ -23,7 +23,6 @@ svg {
 .background path {
   fill: none;
   stroke: #ddd;
-  shape-rendering: crispEdges;
 }
 
 .active {
@@ -34,8 +33,7 @@ svg {
 .foreground {
   fill: none;
   stroke: steelblue;
-  stroke-width: 1px;
-  opacity: 0.6;
+  stroke-width: 1.5px;
 }
 
 .brush .extent {
