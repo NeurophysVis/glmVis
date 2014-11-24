@@ -55,17 +55,7 @@
         style = svg.selectAll("style").data([{}]).enter()
             .append("style")
             .attr("type", "text/css");
-        // Slider
-        slider = d3.select("#slider");
-        timePeriods = ["Intertrial Interval", "Fixation", "Rule Stimulus", "Stimulus Response", "Saccade", "Reward"];
-        slider.on("change", function() {
-            var curInterval, step;
-            step = this.value;
-            curInterval = timePeriods[step];
-            params.data = curInterval + " apc";
-            vis.loaddata(params);
-        })
-
+            
         // this is where we can insert style that will affect the svg directly.
         defs = svg.selectAll("defs").data([{}]).enter()
             .append("defs");
