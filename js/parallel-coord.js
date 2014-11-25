@@ -116,26 +116,26 @@
                 Repetition1: "Switch History",
                 No_Previous_Error: "Error History",
                 Previous_Error: "Error History",
-                Rule: "Rule"
+                Overall: "Overall"
             };
             // Extract plot dimensions
             var dimensions = d3.keys(dimensionOrder).filter(function(dim) {
                 return d3.keys(data[0]).indexOf(dim) > -1;
             });
 
-            // Formatting function for normalized firing rate
-            var formatting = d3.format(".3g");
-
-            // Normalize Firing Rates
-            data.map(function(neuron, neuronInd) {
-                dimensions.map(function(dim) {
-                    var value = +neuron[dim] / +neuron["Average_Firing_Rate"];
-                    if (Math.abs(value) < 1E-3 || Math.abs(value) === Infinity || isNaN(value)) {
-                        value = 0.00;
-                    }
-                    data[neuronInd][dim] = formatting(value);
-                });
-            });
+            // // Formatting function for normalized firing rate
+            // var formatting = d3.format(".3g");
+            //
+            // // Normalize Firing Rates
+            // data.map(function(neuron, neuronInd) {
+            //     dimensions.map(function(dim) {
+            //         var value = +neuron[dim] / +neuron["Average_Firing_Rate"];
+            //         if (Math.abs(value) < 1E-3 || Math.abs(value) === Infinity || isNaN(value)) {
+            //             value = 0.00;
+            //         }
+            //         data[neuronInd][dim] = formatting(value);
+            //     });
+            // });
 
             rulePrefVis.dimensions = dimensions;
             rulePrefVis.dimensionOrder = dimensionOrder;
