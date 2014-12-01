@@ -1,10 +1,10 @@
 (function() {
-    rulePrefVis = {};
+    rulePref = {};
     var width, height,
         chart, svg,
         defs, style;
     // Set svg sizing and margins
-    rulePrefVis.init = function(params) {
+    rulePref.init = function(params) {
 
         if (!params) {
             params = {};
@@ -50,7 +50,7 @@
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
             .attr("id", "drawingArea");
 
-        // rulePrefVis.init can be re-ran to pass different height/width values
+        // rulePref.init can be re-ran to pass different height/width values
         // to the svg. this doesn't create new svg elements.
         style = svg.selectAll("style").data([{}]).enter()
             .append("style")
@@ -71,9 +71,9 @@
             .attr("d", "M 0,0 V 4 L6,2 Z");
 
         // Load Data
-        rulePrefVis.loaddata(params);
+        rulePref.loaddata(params);
     };
-    rulePrefVis.loaddata = function(params) {
+    rulePref.loaddata = function(params) {
         if (!params) {
             params = {};
         }
@@ -86,9 +86,9 @@
             // Load csv data
             d3.csv(curFile, function(error, csv) {
 
-                rulePrefVis.data = preProcess(csv); // copy to globally accessible object
+                rulePref.data = preProcess(csv); // copy to globally accessible object
                 // Draw visualization
-                rulePrefVis.draw(params);
+                rulePref.draw(params);
             }); // end csv loading function
         }); // End load style function
 
@@ -137,13 +137,13 @@
             //     });
             // });
 
-            rulePrefVis.dimensions = dimensions;
-            rulePrefVis.dimensionOrder = dimensionOrder;
+            rulePref.dimensions = dimensions;
+            rulePref.dimensionOrder = dimensionOrder;
             return data;
 
         }
     };
-    rulePrefVis.draw = function(params) {
+    rulePref.draw = function(params) {
         var PLOTBUFFER = 100,
             line = d3.svg.line(),
             curMonkey = d3.selectAll("#monkeySelector").selectAll(".selected").property("id"),
@@ -157,7 +157,7 @@
             .attr("class", "tooltip")
             .style("opacity", 1e-6);
         // Exclude neurons less than 1 Hz or not corresponding to the selected monkey
-        var neurons = rulePrefVis.data.filter(function(d) {
+        var neurons = rulePref.data.filter(function(d) {
             var isMonkey = (d["Monkey"] == curMonkey) || (curMonkey == "All");
             return isMonkey;
         });
@@ -173,7 +173,7 @@
             .entries(neurons);
 
         // Create brushes for all the dimensions
-        rulePrefVis.dimensions.map(function(dim) {
+        rulePref.dimensions.map(function(dim) {
             brushes[dim] = d3.svg.brush()
                 .x(xScale)
                 .on("brush", brushed)
@@ -197,14 +197,14 @@
         d3.selectAll("#monkeySelector").selectAll("a").on("click", function() {
             d3.selectAll("#monkeySelector").selectAll("a").classed("selected", false);
             d3.select(this).classed("selected", true);
-            rulePrefVis.draw(params)
+            rulePref.draw(params)
         });
         d3.selectAll("#intervalSelector").selectAll("a").on("click", function() {
             d3.selectAll("#intervalSelector").selectAll("a").classed("selected", false);
             d3.select(this).classed("selected", true);
             curInterval = d3.select(this).property("id");
             params.data = curInterval + " apc";
-            rulePrefVis.loaddata(params);
+            rulePref.loaddata(params);
         });
 
         // Set up Scales
@@ -212,13 +212,13 @@
                 var xMin, xMax;
 
                 // Set xScale domain and range by looping over each data dimension and getting its max and min
-                xMin = d3.min(rulePrefVis.dimensions.map(function(dim) {
+                xMin = d3.min(rulePref.dimensions.map(function(dim) {
                     return d3.min(data, function(neuron) {
                         return +neuron[dim];
                     });
                 }));
 
-                xMax = d3.max(rulePrefVis.dimensions.map(function(dim) {
+                xMax = d3.max(rulePref.dimensions.map(function(dim) {
                     return d3.max(data, function(neuron) {
                         return +neuron[dim];
                     });
@@ -237,10 +237,10 @@
                     .range([0, (width - PLOTBUFFER) / 2]);
 
                 yScale = d3.scale.ordinal()
-                    .domain(rulePrefVis.dimensions)
+                    .domain(rulePref.dimensions)
                     .rangePoints([height, 0], 1);
 
-                dimColorScale = d3.scale.category10().domain(d3.values(rulePrefVis.dimensionOrder).reverse());
+                dimColorScale = d3.scale.category10().domain(d3.values(rulePref.dimensionOrder).reverse());
             }
             // Draws parallel line plot
         function drawParallel(brainArea) {
@@ -295,7 +295,7 @@
                     .attr("class", "dimensions");
                 // Select dimensions group and bind to dimension data
                 dimG = dims.selectAll("g.dimension")
-                    .data(rulePrefVis.dimensions, String);
+                    .data(rulePref.dimensions, String);
                 // Remove dimension groups that don't currently exist
                 dimG.exit()
                     .transition()
@@ -324,7 +324,7 @@
                         return fixDimNames(dim);
                     })
                     .style("fill", function(d) {
-                        return dimColorScale(rulePrefVis.dimensionOrder[d]);
+                        return dimColorScale(rulePref.dimensionOrder[d]);
                     });
                 // Call axis for each dimension
                 axisG.each(function() {
@@ -500,7 +500,7 @@
             }
             // Returns the path for a given data point.
         function path(neuron) {
-                return line(rulePrefVis.dimensions.map(function(dim) {
+                return line(rulePref.dimensions.map(function(dim) {
                     return [xScale(+neuron[dim]), yScale(dim)];
                 }));
             }
@@ -518,7 +518,7 @@
                 toolTip
                     .style("opacity", 1e-6);
                 // Get active dimension and their extents (min, max)
-                var actives = rulePrefVis.dimensions.filter(function(dim) {
+                var actives = rulePref.dimensions.filter(function(dim) {
                         return !brushes[dim].empty();
                     }),
                     extents = actives.map(function(dim) {
