@@ -47,14 +47,14 @@
     </div>
 
     <script src="http://d3js.org/d3.v3.min.js"></script>
-    <script src="js/rulePref.js"></script>
+    <script src="js/parallel-coord.js"></script>
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="js/bootstrap.min.js"></script>
     <script>
         var cur_file =
-            "Intertrial Interval norm_apc";
+            "Intertrial Interval apc";
         var params = {
             data: cur_file,
             width: 960,
@@ -62,7 +62,7 @@
         };
 
         // Initialized visualization
-        rulePref.init(params);
+        rulePrefVis.init(params);
     </script>
 
 </body>
