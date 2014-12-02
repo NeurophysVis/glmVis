@@ -203,33 +203,33 @@
             d3.selectAll("#intervalSelector").selectAll("a").classed("selected", false);
             d3.select(this).classed("selected", true);
             curInterval = d3.select(this).property("id");
-            params.data = curInterval + " apc";
+            params.data = curInterval + " norm_apc";
             rulePref.loaddata(params);
         });
 
         // Set up Scales
         function setupScales(data) {
-                var xMin, xMax;
+                var xMin = -1, xMax = 1;
 
-                // Set xScale domain and range by looping over each data dimension and getting its max and min
-                xMin = d3.min(rulePref.dimensions.map(function(dim) {
-                    return d3.min(data, function(neuron) {
-                        return +neuron[dim];
-                    });
-                }));
-
-                xMax = d3.max(rulePref.dimensions.map(function(dim) {
-                    return d3.max(data, function(neuron) {
-                        return +neuron[dim];
-                    });
-                }));
-
-                // Make the max and min of the scale symmetric
-                if (Math.abs(xMin) > Math.abs(xMax)) {
-                    xMax = Math.abs(xMin);
-                } else if (Math.abs(xMin) < Math.abs(xMax)) {
-                    xMin = -1 * Math.abs(xMax);
-                };
+                // // Set xScale domain and range by looping over each data dimension and getting its max and min
+                // xMin = d3.min(rulePref.dimensions.map(function(dim) {
+                //     return d3.min(data, function(neuron) {
+                //         return +neuron[dim];
+                //     });
+                // }));
+                //
+                // xMax = d3.max(rulePref.dimensions.map(function(dim) {
+                //     return d3.max(data, function(neuron) {
+                //         return +neuron[dim];
+                //     });
+                // }));
+                //
+                // // Make the max and min of the scale symmetric
+                // if (Math.abs(xMin) > Math.abs(xMax)) {
+                //     xMax = Math.abs(xMin);
+                // } else if (Math.abs(xMin) < Math.abs(xMax)) {
+                //     xMin = -1 * Math.abs(xMax);
+                // };
 
                 // Set xScale for each dimension
                 xScale = d3.scale.linear()
