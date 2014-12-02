@@ -71,9 +71,9 @@
             .attr("d", "M 0,0 V 4 L6,2 Z");
 
         // Load Data
-        rulePref.loaddata(params);
+        rulePref.loadData(params);
     };
-    rulePref.loaddata = function(params) {
+    rulePref.loadData = function(params) {
         if (!params) {
             params = {};
         }
@@ -147,7 +147,7 @@
         var PLOTBUFFER = 100,
             line = d3.svg.line(),
             curMonkey = d3.selectAll("#monkeySelector").selectAll(".selected").property("id"),
-            xScale, yScale, dimColorScale, plotG, brushes = {};
+            xScale, yScale, dimColorScale, plotG, brushes = {}, toolTip;
 
         // Tool Tip - make a hidden div to appear as a tooltip when mousing over a line
         toolTip = d3.select("body").selectAll("div.tooltip").data([{}]);
@@ -202,9 +202,8 @@
         d3.selectAll("#intervalSelector").selectAll("a").on("click", function() {
             d3.selectAll("#intervalSelector").selectAll("a").classed("selected", false);
             d3.select(this).classed("selected", true);
-            curInterval = d3.select(this).property("id");
-            params.data = curInterval + " norm_apc";
-            rulePref.loaddata(params);
+            params.data = d3.select(this).property("id") + " norm_apc";
+            rulePref.loadData(params);
         });
 
         // Set up Scales
