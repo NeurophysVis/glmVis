@@ -78,11 +78,11 @@
             params = {};
         }
         // Apply style file (css) and embed in svg
-        d3.text(params.style || "/css/parallel-coord.txt", function(error, txt) {
+        d3.text(params.style || "css/parallel-coord.txt", function(error, txt) {
             // Embedded style file in the svg.
             style.text(txt);
             // ("#" + Math.random()) makes sure the script loads the file each time instead of using a cached version, remove once live
-            var curFile = "/DATA/" + params.data + ".csv" + "#" + Math.random();
+            var curFile = "DATA/" + params.data + ".csv" + "#" + Math.random();
             // Load csv data
             d3.csv(curFile, function(error, csv) {
 
