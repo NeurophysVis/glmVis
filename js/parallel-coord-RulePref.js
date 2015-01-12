@@ -564,7 +564,7 @@
             })
         }
         function mousedblclick(d){
-          console.log(d)
+          window.location = "/RasterVis/index.html?curFile=" + d.Session_Name + "&curNeuron=" + d.Name ;
         }
     }
 
