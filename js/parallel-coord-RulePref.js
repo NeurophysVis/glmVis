@@ -151,11 +151,10 @@
 
         // Tool Tip - make a hidden div to appear as a tooltip when mousing over a line
         toolTip = d3.select("body").selectAll("div.tooltip").data([{}]);
-        toolTip
-            .enter()
+        toolTip.enter()
             .append("div")
-            .attr("class", "tooltip")
-            .style("opacity", 1e-6);
+              .attr("class", "tooltip")
+              .style("opacity", 1e-6);
         // Exclude neurons less than 1 Hz or not corresponding to the selected monkey
         var neurons = rulePref.data.filter(function(d) {
             var isMonkey = (d["Monkey"] == curMonkey) || (curMonkey == "All");
@@ -564,7 +563,20 @@
             })
         }
         function mousedblclick(d){
-          window.location = "/RasterVis/index.html?curFile=" + d.Session_Name + "&curNeuron=" + d.Name ;
+
+          var timeInterval = d3.select("#intervalSelector a.selected").property("id");
+          var timeMap = [
+            {timeInterval: "Intertrial Interval", cue: "start_time"},
+            {timeInterval: "Fixation", cue: "fixation_onset"},
+            {timeInterval: "Rule Stimulus", cue: "rule_onset"},
+            {timeInterval: "Stimulus Response", cue: "stim_onset"},
+            {timeInterval: "Saccade", cue: "react_time"},
+            {timeInterval: "Reward", cue: "reward_time"},
+          ];
+          var timeCue = timeMap.filter(function(d) {
+            return d.timeInterval == timeInterval;
+          });
+          window.location = "/RasterVis/index.html?curFile=" + d.Session_Name + "&curNeuron=" + d.Name + "&curTime=" + timeCue[0].cue;
         }
     }
 
