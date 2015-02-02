@@ -96,8 +96,11 @@
         function preProcess(data) {
 
             var dimensionOrder = {
-                minus1_Std_Dev_of_Prep_Time: "Normalized Prep Time",
-                plus1_Std_Dev_of_Prep_Time: "Normalized Prep Time",
+                Shortest: "Normalized Prep Time",
+                Short: "Normalized Prep Time",
+                Medium: "Normalized Prep Time",
+                Long: "Normalized Prep Time",
+                Longest: "Normalized Prep Time",
                 Congruent: "Current Congruency",
                 Incongruent: "Current Congruency",
                 Previous_Congruent: "Previous Congruency",
@@ -201,7 +204,7 @@
         d3.selectAll("#intervalSelector").selectAll("a").on("click", function() {
             d3.selectAll("#intervalSelector").selectAll("a").classed("selected", false);
             d3.select(this).classed("selected", true);
-            params.data = d3.select(this).property("id") + " norm_apc";
+            params.data = d3.select(this).property("id") + " norm_apc" + " rule interactions";
             rulePref.loadData(params);
         });
 
