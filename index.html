@@ -31,7 +31,10 @@
         </div>
         <div class="page-header"></div>
         <div class="row">
-            <div id="chart"></div>
+            <div id="figure2-chart"></div>
+        </div>
+        <div class="row">
+            <div id="figure3-chart"></div>
         </div>
         <div class="row">
             <p id="figure-3" class="col-md-8">Figure 3: <strong> Rule Preference by Brain Area and
@@ -45,19 +48,22 @@
 
     <script src="http://d3js.org/d3.v3.min.js"></script>
     <script src="js/parallel-coord-RulePref.js"></script>
+    <script src="js/parallel-coord-MainEffects.js"></script>
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="js/bootstrap.min.js"></script>
     <script>
-        var rulePrefParams = {
-            data: "Intertrial Interval norm_apc rule interactions",
-            width: 960,
-            height: 500
+        var chartParams = {
+              timePeriod: "Intertrial Interval",
+              width: 960,
+              height: 500
         };
 
         // Initialized visualization
-        rulePref.init(rulePrefParams);
+        rulePref.init(chartParams);
+        mainEffects.init(chartParams);
+
     </script>
 
 </body>

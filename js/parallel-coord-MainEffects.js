@@ -1,15 +1,15 @@
 (function() {
-    rulePref = {};
+    mainEffects = {};
     var width, height,
         chart, svg,
         defs, style;
     // Set svg sizing and margins
-    rulePref.init = function(params) {
+    mainEffects.init = function(params) {
 
         if (!params) {
             params = {};
         }
-        chart = d3.select("#figure3-chart"); // placeholder div for svg
+        chart = d3.select("#figure2-chart"); // placeholder div for svg
         var margin = {
                 top: 50,
                 right: 10,
@@ -50,7 +50,7 @@
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
             .attr("id", "drawingArea");
 
-        // rulePref.init can be re-ran to pass different height/width values
+        // mainEffects.init can be re-ran to pass different height/width values
         // to the svg. this doesn't create new svg elements.
         style = svg.selectAll("style").data([{}]).enter()
             .append("style")
@@ -71,9 +71,9 @@
             .attr("d", "M 0,0 V 4 L6,2 Z");
 
         // Load Data
-        rulePref.loadData(params);
+        mainEffects.loadData(params);
     };
-    rulePref.loadData = function(params) {
+    mainEffects.loadData = function(params) {
         if (!params) {
             params = {};
         }
@@ -82,13 +82,13 @@
             // Embedded style file in the svg.
             style.text(txt);
             // ("#" + Math.random()) makes sure the script loads the file each time instead of using a cached version, remove once live
-            var curFile = "DATA/" + params.timePeriod + " norm_apc rule interactions.csv" + "#" + Math.random();
+            var curFile = "DATA/" + params.timePeriod + " norm_apc main effects.csv" + "#" + Math.random();
             // Load csv data
             d3.csv(curFile, function(error, csv) {
 
-                rulePref.data = preProcess(csv); // copy to globally accessible object
+                mainEffects.data = preProcess(csv); // copy to globally accessible object
                 // Draw visualization
-                rulePref.draw(params);
+                mainEffects.draw(params);
             }); // end csv loading function
         }); // End load style function
 
@@ -96,30 +96,25 @@
         function preProcess(data) {
 
             var dimensionOrder = {
-                Shortest: "Normalized Prep Time",
-                Short: "Normalized Prep Time",
-                Medium: "Normalized Prep Time",
-                Long: "Normalized Prep Time",
-                Longest: "Normalized Prep Time",
-                Congruent: "Current Congruency",
-                Incongruent: "Current Congruency",
-                Previous_Congruent: "Previous Congruency",
-                Previous_Incongruent: "Previous Congruency",
-                Repetition11plus: "Rule Repetition",
-                Repetition11plus: "Rule Repetition",
-                Repetition10: "Rule Repetition",
-                Repetition9: "Rule Repetition",
-                Repetition8: "Rule Repetition",
-                Repetition7: "Rule Repetition",
-                Repetition6: "Rule Repetition",
-                Repetition5: "Rule Repetition",
-                Repetition4: "Rule Repetition",
-                Repetition3: "Rule Repetition",
-                Repetition2: "Rule Repetition",
-                Repetition1: "Rule Repetition",
-                No_Previous_Error: "Error History",
-                Previous_Error: "Error History",
-                Overall: "Overall"
+
+                Medium_minus_Longest: "Normalized Prep Time",
+                Short_minus_Longest: "Normalized Prep Time",
+                Shortest_minus_Longest: "Normalized Prep Time",
+                Right_minus_Left: "Response Direction",
+                Previous_Congruent_minus_Previous_Incongruent: "Previous Congruency",
+                Congruent_minus_Incongruent: "Current Congruency",
+                Repetition10_minus_Repetition11plus: "Rule Repetition",
+                Repetition9_minus_Repetition11plus: "Rule Repetition",
+                Repetition8_minus_Repetition11plus: "Rule Repetition",
+                Repetition7_minus_Repetition11plus: "Rule Repetition",
+                Repetition6_minus_Repetition11plus: "Rule Repetition",
+                Repetition5_minus_Repetition11plus: "Rule Repetition",
+                Repetition4_minus_Repetition11plus: "Rule Repetition",
+                Repetition3_minus_Repetition11plus: "Rule Repetition",
+                Repetition2_minus_Repetition11plus: "Rule Repetition",
+                Repetition1_minus_Repetition11plus: "Rule Repetition",
+                No_Previous_Error_minus_Previous_Error: "Error History",
+                Orientation_minus_Color: "Rule"
             };
             // Extract plot dimensions
             var dimensions = d3.keys(dimensionOrder).filter(function(dim) {
@@ -140,13 +135,13 @@
             //     });
             // });
 
-            rulePref.dimensions = dimensions;
-            rulePref.dimensionOrder = dimensionOrder;
+            mainEffects.dimensions = dimensions;
+            mainEffects.dimensionOrder = dimensionOrder;
             return data;
 
         }
     };
-    rulePref.draw = function(params) {
+    mainEffects.draw = function(params) {
         var PLOTBUFFER = 100,
             line = d3.svg.line(),
             curMonkey = d3.selectAll("#monkeySelector").selectAll(".selected").property("id"),
@@ -159,7 +154,7 @@
               .attr("class", "tooltip")
               .style("opacity", 1e-6);
         // Exclude neurons less than 1 Hz or not corresponding to the selected monkey
-        var neurons = rulePref.data.filter(function(d) {
+        var neurons = mainEffects.data.filter(function(d) {
             var isMonkey = (d["Monkey"] == curMonkey) || (curMonkey == "All");
             return isMonkey;
         });
@@ -175,7 +170,7 @@
             .entries(neurons);
 
         // Create brushes for all the dimensions
-        rulePref.dimensions.map(function(dim) {
+        mainEffects.dimensions.map(function(dim) {
             brushes[dim] = d3.svg.brush()
                 .x(xScale)
                 .on("brush", brushed)
@@ -199,15 +194,16 @@
         d3.selectAll("#monkeySelector").selectAll("a").on("click", function() {
             d3.selectAll("#monkeySelector").selectAll("a").classed("selected", false);
             d3.select(this).classed("selected", true);
-            rulePref.draw(params);
             mainEffects.draw(params);
+            rulePref.draw(params);
+
         });
         d3.selectAll("#intervalSelector").selectAll("a").on("click", function() {
             d3.selectAll("#intervalSelector").selectAll("a").classed("selected", false);
             d3.select(this).classed("selected", true);
             params.timePeriod = d3.select(this).property("id");
-            rulePref.loadData(params);
             mainEffects.loadData(params);
+            rulePref.loadData(params);
         });
 
         // Set up Scales
@@ -215,13 +211,13 @@
                 var xMin = -1, xMax = 1;
 
                 // // Set xScale domain and range by looping over each data dimension and getting its max and min
-                // xMin = d3.min(rulePref.dimensions.map(function(dim) {
+                // xMin = d3.min(mainEffects.dimensions.map(function(dim) {
                 //     return d3.min(data, function(neuron) {
                 //         return +neuron[dim];
                 //     });
                 // }));
                 //
-                // xMax = d3.max(rulePref.dimensions.map(function(dim) {
+                // xMax = d3.max(mainEffects.dimensions.map(function(dim) {
                 //     return d3.max(data, function(neuron) {
                 //         return +neuron[dim];
                 //     });
@@ -240,10 +236,10 @@
                     .range([0, (width - PLOTBUFFER) / 2]);
 
                 yScale = d3.scale.ordinal()
-                    .domain(rulePref.dimensions)
+                    .domain(mainEffects.dimensions)
                     .rangePoints([height, 0], 1);
 
-                dimColorScale = d3.scale.category10().domain(d3.values(rulePref.dimensionOrder).reverse());
+                dimColorScale = d3.scale.category10().domain(d3.values(mainEffects.dimensionOrder).reverse());
             }
             // Draws parallel line plot
         function drawParallel(brainArea) {
@@ -298,7 +294,7 @@
                     .attr("class", "dimensions");
                 // Select dimensions group and bind to dimension data
                 dimG = dims.selectAll("g.dimension")
-                    .data(rulePref.dimensions, String);
+                    .data(mainEffects.dimensions, String);
                 // Remove dimension groups that don't currently exist
                 dimG.exit()
                     .transition()
@@ -327,7 +323,7 @@
                         return fixDimNames(dim);
                     })
                     .style("fill", function(d) {
-                        return dimColorScale(rulePref.dimensionOrder[d]);
+                        return dimColorScale(mainEffects.dimensionOrder[d]);
                     });
                 // Call axis for each dimension
                 axisG.each(function() {
@@ -503,7 +499,7 @@
             }
             // Returns the path for a given data point.
         function path(neuron) {
-                return line(rulePref.dimensions.map(function(dim) {
+                return line(mainEffects.dimensions.map(function(dim) {
                     return [xScale(+neuron[dim]), yScale(dim)];
                 }));
             }
@@ -520,8 +516,8 @@
                 // On brush, fade tool tip
                 toolTip
                     .style("opacity", 1e-6);
-                // Get active dimension and their extents (min, max) in current plot
-                var actives = rulePref.dimensions.filter(function(dim) {
+                // Get active dimension and their extents (min, max)
+                var actives = mainEffects.dimensions.filter(function(dim) {
                         return !brushes[dim].empty();
                     }),
                     extents = actives.map(function(dim) {
@@ -534,20 +530,20 @@
                     }) ? null : "none";
                 });
                 // Select brushed neurons in main effects plot
-                var activeNeurons_ACC = d3.selectAll("#figure3-chart")
+                var activeNeurons_ACC = d3.selectAll("#figure2-chart")
                       .selectAll("#ACC")
                       .selectAll(".foreground").selectAll("path")
                       .filter(function() {
                         return d3.select(this).style("display") == "inline";
                       }).data(),
-                    activeNeurons_dlPFC = d3.selectAll("#figure3-chart")
+                    activeNeurons_dlPFC = d3.selectAll("#figure2-chart")
                         .selectAll("#dlPFC")
                         .selectAll(".foreground").selectAll("path")
                         .filter(function() {
                           return d3.select(this).style("display") == "inline";
                         }).data();
                 activeNeurons = activeNeurons_ACC.concat(activeNeurons_dlPFC);
-                d3.selectAll("#figure2-chart").selectAll(".foreground").selectAll("path").style("display", function(neuron) {
+                d3.selectAll("#figure3-chart").selectAll(".foreground").selectAll("path").style("display", function(neuron) {
                     return activeNeurons.some(function(d){
                       return (d.Name == neuron.Name);
                     }) ? null : "none";
