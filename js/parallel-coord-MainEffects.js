@@ -14,7 +14,7 @@
                 top: 50,
                 right: 10,
                 bottom: 10,
-                left: 150
+                left: 260
             },
             padding = {
                 top: 60,
@@ -101,8 +101,8 @@
                 Short_minus_Longest: "Normalized Prep Time",
                 Shortest_minus_Longest: "Normalized Prep Time",
                 Right_minus_Left: "Response Direction",
-                Previous_Congruent_minus_Previous_Incongruent: "Previous Congruency",
-                Congruent_minus_Incongruent: "Current Congruency",
+                Previous_Incongruent_minus_Previous_Congruent: "Previous Congruency",
+                Incongruent_minus_Congruent: "Current Congruency",
                 Repetition10_minus_Repetition11plus: "Rule Repetition",
                 Repetition9_minus_Repetition11plus: "Rule Repetition",
                 Repetition8_minus_Repetition11plus: "Rule Repetition",
@@ -113,7 +113,7 @@
                 Repetition3_minus_Repetition11plus: "Rule Repetition",
                 Repetition2_minus_Repetition11plus: "Rule Repetition",
                 Repetition1_minus_Repetition11plus: "Rule Repetition",
-                No_Previous_Error_minus_Previous_Error: "Error History",
+                Previous_Error_minus_No_Previous_Error: "Error History",
                 Orientation_minus_Color: "Rule"
             };
             // Extract plot dimensions
@@ -142,7 +142,7 @@
         }
     };
     mainEffects.draw = function(params) {
-        var PLOTBUFFER = 100,
+        var PLOTBUFFER = 30,
             line = d3.svg.line(),
             curMonkey = d3.selectAll("#monkeySelector").selectAll(".selected").property("id"),
             xScale, yScale, dimColorScale, plotG, brushes = {}, toolTip;
@@ -313,18 +313,18 @@
                 // Append axis and text if it doesn't exist
                 axisG.enter()
                     .append("g")
-                    .attr("class", "grid")
-                    .style("stroke-dasharray", ("3, 3"))
+                      .attr("class", "grid")
+                      .style("stroke-dasharray", ("3, 3"))
                     .append("text")
-                    .style("text-anchor", "end")
-                    .attr("x", -5)
-                    .attr("y", 3)
-                    .text(function(dim) {
-                        return fixDimNames(dim);
-                    })
-                    .style("fill", function(d) {
+                      .style("text-anchor", "end")
+                      .attr("x", -5)
+                      .attr("y", 3)
+                      .text(function(dim) {
+                        return (brainArea.key === 'dlPFC') ? "" : fixDimNames(dim);
+                      })
+                      .style("fill", function(d) {
                         return dimColorScale(mainEffects.dimensionOrder[d]);
-                    });
+                      });
                 // Call axis for each dimension
                 axisG.each(function() {
                     d3.select(this).call(d3.svg.axis()

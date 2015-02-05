@@ -14,7 +14,7 @@
                 top: 50,
                 right: 10,
                 bottom: 10,
-                left: 150
+                left: 250
             },
             padding = {
                 top: 60,
@@ -147,7 +147,7 @@
         }
     };
     rulePref.draw = function(params) {
-        var PLOTBUFFER = 100,
+        var PLOTBUFFER = 30,
             line = d3.svg.line(),
             curMonkey = d3.selectAll("#monkeySelector").selectAll(".selected").property("id"),
             xScale, yScale, dimColorScale, plotG, brushes = {}, toolTip;
@@ -317,18 +317,18 @@
                 // Append axis and text if it doesn't exist
                 axisG.enter()
                     .append("g")
-                    .attr("class", "grid")
-                    .style("stroke-dasharray", ("3, 3"))
+                      .attr("class", "grid")
+                      .style("stroke-dasharray", ("3, 3"))
                     .append("text")
-                    .style("text-anchor", "end")
-                    .attr("x", -5)
-                    .attr("y", 3)
-                    .text(function(dim) {
-                        return fixDimNames(dim);
-                    })
-                    .style("fill", function(d) {
+                      .style("text-anchor", "end")
+                      .attr("x", -5)
+                      .attr("y", 3)
+                      .text(function(dim) {
+                        return (brainArea.key === 'dlPFC') ? "" : fixDimNames(dim);
+                      })
+                      .style("fill", function(d) {
                         return dimColorScale(rulePref.dimensionOrder[d]);
-                    });
+                      });
                 // Call axis for each dimension
                 axisG.each(function() {
                     d3.select(this).call(d3.svg.axis()
