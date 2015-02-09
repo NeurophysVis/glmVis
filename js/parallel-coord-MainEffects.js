@@ -409,73 +409,8 @@
                 drawLabels();
                 // Labels
                 function drawLabels() {
-                    // Lines with arrows
-                    arrowData = [{
-                        "Name": "Orient.",
-                        "values": [
-                            [xScale(0) + 100, height],
-                            [xScale(0) + 110, height]
-                        ]
-                    }, {
-                        "Name": "Color",
-                        "values": [
-                            [xScale(0) - 100, height],
-                            [xScale(0) - 110, height]
-                        ]
-                    }];
-                    arrowG = curPlot.selectAll("g.arrowLine").data([{}]);
-                    arrowG.enter()
-                        .append("g")
-                        .attr("class", "arrowLine");
-                    arrowLine = arrowG.selectAll("path").data(arrowData);
-                    arrowEnter = arrowLine.enter()
-                        .append("path")
-                        .attr("stroke", "black")
-                        .attr("stroke-width", "1.5px")
-                        .attr("marker-end", "url(#arrowhead)");
-                    arrowLine
-                        .attr("d", function(d) {
-                            return line(d.values);
-                        });
+
                     // Axis Labels
-                    colorLabel = curPlot.selectAll("text.colorLabel").data([{}]);
-                    colorLabel.enter()
-                        .append("text")
-                        .attr("class", "colorLabel")
-                        .attr("x", xScale(0) - 10 + "px")
-                        .attr("y", height + "px")
-                        .attr("dy", 3 + "px")
-                        .attr("text-anchor", "end")
-                        .style("font-size", "12px")
-                        .text("Higher Firing for");
-                    colorLabel.enter()
-                        .append("text")
-                        .attr("class", "colorLabel")
-                        .attr("x", xScale(0) - 20 + "px")
-                        .attr("y", height + 10 + "px")
-                        .attr("dy", 3 + "px")
-                        .attr("text-anchor", "end")
-                        .style("font-size", "12px")
-                        .text("Color Rule");
-                    orientLabel = curPlot.selectAll("text.orientLabel").data([{}]);
-                    orientLabel.enter()
-                        .append("text")
-                        .attr("class", "orientLabel")
-                        .attr("x", xScale(0) + 10 + "px")
-                        .attr("y", height + "px")
-                        .attr("dy", 3 + "px")
-                        .attr("text-anchor", "start")
-                        .style("font-size", "12px")
-                        .text("Higher Firing for");
-                    orientLabel.enter()
-                        .append("text")
-                        .attr("class", "orientLabel")
-                        .attr("x", xScale(0) + 20 + "px")
-                        .attr("y", height + 10 + "px")
-                        .attr("dy", 3 + "px")
-                        .attr("text-anchor", "start")
-                        .style("font-size", "12px")
-                        .text("Orient. Rule");
                     xAxisLabel = curPlot.selectAll("text.xAxisLabel").data([{}]);
                     xAxisLabel.enter()
                       .append("text")
