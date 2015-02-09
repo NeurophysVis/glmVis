@@ -14,7 +14,7 @@
                 top: 50,
                 right: 10,
                 bottom: 10,
-                left: 250
+                left: 260
             },
             padding = {
                 top: 60,
