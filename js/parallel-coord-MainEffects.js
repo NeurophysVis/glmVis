@@ -11,15 +11,15 @@
         }
         chart = d3.select("#figure2-chart"); // placeholder div for svg
         var margin = {
-                top: 50,
+                top: 30,
                 right: 10,
                 bottom: 10,
                 left: 260
             },
             padding = {
-                top: 60,
+                top: 30,
                 right: 60,
-                bottom: 60,
+                bottom: 30,
                 left: 60
             };
         var outerWidth = params.width || 960,
@@ -121,20 +121,6 @@
                 return d3.keys(data[0]).indexOf(dim) > -1;
             });
 
-            // // Formatting function for normalized firing rate
-            // var formatting = d3.format(".3g");
-            //
-            // // Normalize Firing Rates
-            // data.map(function(neuron, neuronInd) {
-            //     dimensions.map(function(dim) {
-            //         var value = +neuron[dim] / +neuron["Average_Firing_Rate"];
-            //         if (Math.abs(value) < 1E-3 || Math.abs(value) === Infinity || isNaN(value)) {
-            //             value = 0.00;
-            //         }
-            //         data[neuronInd][dim] = formatting(value);
-            //     });
-            // });
-
             mainEffects.dimensions = dimensions;
             mainEffects.dimensionOrder = dimensionOrder;
             return data;
@@ -209,26 +195,6 @@
         // Set up Scales
         function setupScales(data) {
                 var xMin = -1, xMax = 1;
-
-                // // Set xScale domain and range by looping over each data dimension and getting its max and min
-                // xMin = d3.min(mainEffects.dimensions.map(function(dim) {
-                //     return d3.min(data, function(neuron) {
-                //         return +neuron[dim];
-                //     });
-                // }));
-                //
-                // xMax = d3.max(mainEffects.dimensions.map(function(dim) {
-                //     return d3.max(data, function(neuron) {
-                //         return +neuron[dim];
-                //     });
-                // }));
-                //
-                // // Make the max and min of the scale symmetric
-                // if (Math.abs(xMin) > Math.abs(xMax)) {
-                //     xMax = Math.abs(xMin);
-                // } else if (Math.abs(xMin) < Math.abs(xMax)) {
-                //     xMin = -1 * Math.abs(xMax);
-                // };
 
                 // Set xScale for each dimension
                 xScale = d3.scale.linear()
@@ -420,16 +386,6 @@
                       .attr("text-anchor", "middle")
                       .text("Norm. Firing Rate");
 
-                    // Title
-                    title = curPlot.selectAll("text.title").data([{}]);
-                    title.enter()
-                        .append("text")
-                        .attr("class", "title")
-                        .attr("x", xScale(0))
-                        .attr("y", height + 50)
-                        .attr("text-anchor", "middle")
-                        .style("font-size", "28px")
-                        .text(brainArea.key);
                 }
             }
             // Returns the path for a given data point.
