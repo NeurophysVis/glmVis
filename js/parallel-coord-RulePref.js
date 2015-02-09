@@ -103,6 +103,8 @@
                 Longest: "Normalized Prep Time",
                 Left: "Response Direction",
                 Right: "Response Direction",
+                Congruent: "Current Congruency",
+                Incongruent: "Current Congruency",
                 Previous_Congruent: "Previous Congruency",
                 Previous_Incongruent: "Previous Congruency",
                 Congruent: "Current Congruency",
