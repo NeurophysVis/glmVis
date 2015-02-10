@@ -13,13 +13,13 @@
         var margin = {
                 top: 30,
                 right: 10,
-                bottom: 10,
+                bottom: 30,
                 left: 260
             },
             padding = {
-                top: 00,
+                top: 60,
                 right: 60,
-                bottom: 30,
+                bottom: 60,
                 left: 60
             };
         var outerWidth = params.width || 960,
@@ -82,7 +82,13 @@
             // Embedded style file in the svg.
             style.text(txt);
             // ("#" + Math.random()) makes sure the script loads the file each time instead of using a cached version, remove once live
-            var curFile = "DATA/" + params.timePeriod + " norm_apc rule interactions.csv" + "#" + Math.random();
+            var timePeriod = params.timePeriod;
+            timePeriod = timePeriod.replace("_", " ");
+            var curFile = "DATA/" + timePeriod + " norm_apc rule interactions.csv" + "#" + Math.random();
+            d3.selectAll("#monkeySelector").selectAll("a").classed("selected", false);
+            d3.selectAll("#monkeySelector").selectAll("a#" + params.curMonkey).classed("selected", true);
+            d3.selectAll("#intervalSelector").selectAll("a").classed("selected", false);
+            d3.selectAll("#intervalSelector").selectAll("a#" + params.timePeriod).classed("selected", true);
             // Load csv data
             d3.csv(curFile, function(error, csv) {
 
@@ -139,8 +145,11 @@
     rulePref.draw = function(params) {
         var PLOTBUFFER = 30,
             line = d3.svg.line(),
-            curMonkey = d3.selectAll("#monkeySelector").selectAll(".selected").property("id"),
             xScale, yScale, dimColorScale, plotG, brushes = {}, toolTip;
+            var curMonkey = params.curMonkey || 'All';
+
+        window.history.pushState({}, "", "/Parallel-Coordinates-APC/index.html?curMonkey=" + curMonkey +
+                                                                "&timePeriod=" + params.timePeriod);
 
         // Tool Tip - make a hidden div to appear as a tooltip when mousing over a line
         toolTip = d3.select("body").selectAll("div.tooltip").data([{}]);
@@ -187,14 +196,13 @@
             .each(drawParallel);
 
         d3.selectAll("#monkeySelector").selectAll("a").on("click", function() {
+            params.curMonkey = d3.select(this).property("id");
             d3.selectAll("#monkeySelector").selectAll("a").classed("selected", false);
-            d3.select(this).classed("selected", true);
+            d3.selectAll("#monkeySelector").selectAll("a#" + params.curMonkey).classed("selected", true);
             rulePref.draw(params);
             mainEffects.draw(params);
         });
         d3.selectAll("#intervalSelector").selectAll("a").on("click", function() {
-            d3.selectAll("#intervalSelector").selectAll("a").classed("selected", false);
-            d3.select(this).classed("selected", true);
             params.timePeriod = d3.select(this).property("id");
             rulePref.loadData(params);
             mainEffects.loadData(params);

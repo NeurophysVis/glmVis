@@ -12,20 +12,20 @@
         <div class="row" role="navigation" data-spy="affix" data-offset-top="125" id="filterNav">
             <div id="intervalSelector">
                 <div class="btn-group " role="group" aria-label="Time Interval">
-                    <a id="Intertrial Interval" class="btn btn-default selected" role="button" href="#">Intertrial Interval</a>
-                    <a id="Fixation" class="btn btn-default" role="button" href="#">Fixation</a>
-                    <a id="Rule Stimulus" class="btn btn-default" role="button" href="#">Rule</a>
-                    <a id="Stimulus Response" class="btn btn-default" role="button" href="#">Test Stimulus</a>
-                    <a id="Saccade" class="btn btn-default" role="button" href="#">Saccade</a>
-                    <a id="Reward" class="btn btn-default" role="button" href="#">Reward</a>
+                    <a id="Intertrial_Interval" class="btn btn-default selected" role="button">Intertrial Interval</a>
+                    <a id="Fixation" class="btn btn-default" role="button">Fixation</a>
+                    <a id="Rule_Stimulus" class="btn btn-default" role="button">Rule</a>
+                    <a id="Stimulus_Response" class="btn btn-default" role="button">Test Stimulus</a>
+                    <a id="Saccade" class="btn btn-default" role="button">Saccade</a>
+                    <a id="Reward" class="btn btn-default" role="button">Reward</a>
                 </div>
             </div>
             <div id="monkeySelector">
                 <div class="btn-group" role="group" aria-label="Monkey">
-                    <a id="All" class="btn btn-default selected" role="button" href="#">All Monkeys</a>
-                    <a id="ISA" class="btn btn-default" role="button" href="#">Monkey ISA</a>
-                    <a id="CC" class="btn btn-default" role="button" href="#">Monkey CC</a>
-                    <a id="CH" class="btn btn-default" role="button" href="#">Monkey CH</a>
+                    <a id="All" class="btn btn-default selected" role="button">All Monkeys</a>
+                    <a id="ISA" class="btn btn-default" role="button">Monkey ISA</a>
+                    <a id="CC" class="btn btn-default" role="button">Monkey CC</a>
+                    <a id="CH" class="btn btn-default" role="button">Monkey CH</a>
                 </div>
             </div>
         </div>
@@ -55,11 +55,17 @@
     <script src="js/bootstrap.min.js"></script>
     <script>
         var chartParams = {
-              timePeriod: "Intertrial Interval",
+              timePeriod: "Intertrial_Interval",
               width: 960,
-              height: 500
+              height: 400
         };
-
+        // Extract parameters from the browser
+        var query = window.location.search.substring(1);
+        var vars = query.split("&");
+        vars.forEach(function(v) {
+          var p = v.split("=");
+          chartParams[p[0]] = p[1];
+        })
         // Initialized visualization
         rulePref.init(chartParams);
         mainEffects.init(chartParams);
