@@ -85,10 +85,6 @@
             var timePeriod = params.timePeriod;
             timePeriod = timePeriod.replace("_", " ");
             var curFile = "DATA/" + timePeriod + " norm_apc rule interactions.csv" + "#" + Math.random();
-            d3.selectAll("#monkeySelector").selectAll("a").classed("selected", false);
-            d3.selectAll("#monkeySelector").selectAll("a#" + params.curMonkey).classed("selected", true);
-            d3.selectAll("#intervalSelector").selectAll("a").classed("selected", false);
-            d3.selectAll("#intervalSelector").selectAll("a#" + params.timePeriod).classed("selected", true);
             // Load csv data
             d3.csv(curFile, function(error, csv) {
 
@@ -148,6 +144,12 @@
             xScale, yScale, dimColorScale, plotG, brushes = {}, toolTip;
             var curMonkey = params.curMonkey || 'All';
 
+        // Update Buttons
+        d3.selectAll("#monkeySelector").selectAll("a").classed("selected", false);
+        d3.selectAll("#monkeySelector").selectAll("a#" + curMonkey).classed("selected", true);
+        d3.selectAll("#intervalSelector").selectAll("a").classed("selected", false);
+        d3.selectAll("#intervalSelector").selectAll("a#" + params.timePeriod).classed("selected", true);
+        // Update window substring
         window.history.pushState({}, "", "/Parallel-Coordinates-APC/index.html?curMonkey=" + curMonkey +
                                                                 "&timePeriod=" + params.timePeriod);
 
@@ -197,8 +199,6 @@
 
         d3.selectAll("#monkeySelector").selectAll("a").on("click", function() {
             params.curMonkey = d3.select(this).property("id");
-            d3.selectAll("#monkeySelector").selectAll("a").classed("selected", false);
-            d3.selectAll("#monkeySelector").selectAll("a#" + params.curMonkey).classed("selected", true);
             rulePref.draw(params);
             mainEffects.draw(params);
         });
