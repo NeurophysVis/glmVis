@@ -136,10 +136,14 @@
           xScale, yScale, dimColorScale, plotG, brushes = {}, toolTip;
           var curMonkey = params.curMonkey || 'All';
 
-          d3.selectAll("#monkeySelector").selectAll("a").classed("selected", false);
-          d3.selectAll("#monkeySelector").selectAll("a#" + curMonkey).classed("selected", true);
-          d3.selectAll("#intervalSelector").selectAll("a").classed("selected", false);
-          d3.selectAll("#intervalSelector").selectAll("a#" + params.timePeriod).classed("selected", true);
+          // Update Buttons
+          monkeySelector = d3.selectAll("#monkeySelector");
+          timeSelector = d3.selectAll("#intervalSelector");
+
+          monkeySelector.selectAll("a").classed("selected", false);
+          monkeySelector.selectAll("a#" + curMonkey).classed("selected", true);
+          timeSelector.selectAll("a").classed("selected", false);
+          timeSelector.selectAll("a#" + params.timePeriod).classed("selected", true);
 
 
       window.history.pushState({}, "", "/Parallel-Coordinates-APC/index.html?curMonkey=" + curMonkey +
@@ -188,15 +192,13 @@
         plotG
             .each(drawParallel);
 
-        d3.selectAll("#monkeySelector").selectAll("a").on("click", function() {
+        monkeySelector.selectAll("a").on("click", function() {
           params.curMonkey = d3.select(this).property("id");
-          d3.selectAll("#monkeySelector").selectAll("a").classed("selected", false);
-          d3.selectAll("#monkeySelector").selectAll("a#" + params.curMonkey).classed("selected", true);
             mainEffects.draw(params);
             rulePref.draw(params);
 
         });
-        d3.selectAll("#intervalSelector").selectAll("a").on("click", function() {
+        timeSelector.selectAll("a").on("click", function() {
             params.timePeriod = d3.select(this).property("id");
             mainEffects.loadData(params);
             rulePref.loadData(params);

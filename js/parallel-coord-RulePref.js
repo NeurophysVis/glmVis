@@ -140,15 +140,18 @@
     };
     rulePref.draw = function(params) {
         var PLOTBUFFER = 30,
-            line = d3.svg.line(),
-            xScale, yScale, dimColorScale, plotG, brushes = {}, toolTip;
-            var curMonkey = params.curMonkey || 'All';
+            line = d3.svg.line(), monkeySelector, timeSelector,
+            xScale, yScale, dimColorScale, plotG, brushes = {}, toolTip,
+            curMonkey = params.curMonkey || 'All';
 
         // Update Buttons
-        d3.selectAll("#monkeySelector").selectAll("a").classed("selected", false);
-        d3.selectAll("#monkeySelector").selectAll("a#" + curMonkey).classed("selected", true);
-        d3.selectAll("#intervalSelector").selectAll("a").classed("selected", false);
-        d3.selectAll("#intervalSelector").selectAll("a#" + params.timePeriod).classed("selected", true);
+        monkeySelector = d3.selectAll("#monkeySelector");
+        timeSelector = d3.selectAll("#intervalSelector");
+
+        monkeySelector.selectAll("a").classed("selected", false);
+        monkeySelector.selectAll("a#" + curMonkey).classed("selected", true);
+        timeSelector.selectAll("a").classed("selected", false);
+        timeSelector.selectAll("a#" + params.timePeriod).classed("selected", true);
         // Update window substring
         window.history.pushState({}, "", "/Parallel-Coordinates-APC/index.html?curMonkey=" + curMonkey +
                                                                 "&timePeriod=" + params.timePeriod);
@@ -197,12 +200,12 @@
         plotG
             .each(drawParallel);
 
-        d3.selectAll("#monkeySelector").selectAll("a").on("click", function() {
+        monkeySelector.selectAll("a").on("click", function() {
             params.curMonkey = d3.select(this).property("id");
             rulePref.draw(params);
             mainEffects.draw(params);
         });
-        d3.selectAll("#intervalSelector").selectAll("a").on("click", function() {
+        timeSelector.selectAll("a").on("click", function() {
             params.timePeriod = d3.select(this).property("id");
             rulePref.loadData(params);
             mainEffects.loadData(params);
