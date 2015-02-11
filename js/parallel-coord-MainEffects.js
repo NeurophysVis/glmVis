@@ -11,7 +11,7 @@
         }
         chart = d3.select("#mainEffects-chart"); // placeholder div for svg
         var margin = {
-                top: 30,
+                top: 40,
                 right: 10,
                 bottom: -10,
                 left: 260
@@ -38,7 +38,7 @@
             }])
             .enter()
             .append("svg");
-        svg = d3.select("svg").attr({
+        svg = chart.select("svg").attr({
                 width: function(d) {
                     return d.width + margin.left + margin.right;
                 },
@@ -50,9 +50,36 @@
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
             .attr("id", "drawingArea");
 
+        avgFiring_height = 200 - padding.top - padding.bottom - margin.top - margin.bottom;
+        avgFiring_chart = d3.select("#avgFiring-chart");
+        avgFiring_chart.selectAll("svg")
+          .data([{
+              width: width + margin.left + margin.right,
+              height: avgFiring_height + margin.top + margin.bottom
+          }])
+          .enter()
+          .append("svg");
+
+          avgFiring_svg = avgFiring_chart.select("svg").attr({
+                  width: function(d) {
+                      return d.width + margin.left + margin.right;
+                  },
+                  height: function(d) {
+                      return d.height + margin.top + margin.bottom;
+                  }
+              })
+              .append("g")
+              .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+              .attr("id", "drawingArea");
+
+
         // mainEffects.init can be re-ran to pass different height/width values
         // to the svg. this doesn't create new svg elements.
         style = svg.selectAll("style").data([{}]).enter()
+            .append("style")
+            .attr("type", "text/css");
+
+        avgFiring_style = avgFiring_svg.selectAll("style").data([{}]).enter()
             .append("style")
             .attr("type", "text/css");
 
@@ -81,6 +108,7 @@
         d3.text(params.style || "css/parallel-coord.txt", function(error, txt) {
             // Embedded style file in the svg.
             style.text(txt);
+            avgFiring_style.text(txt);
             // ("#" + Math.random()) makes sure the script loads the file each time instead of using a cached version, remove once live
             queue()
                 .defer(d3.csv, "DATA/Intertrial Interval norm_apc main effects.csv")
@@ -164,9 +192,22 @@
             .attr("id", function(d) {
                 return d.key;
             });
+        plotHistG = avgFiring_svg.selectAll("g.brainArea").data(neurons);
+        plotHistG
+            .enter()
+            .append("g")
+            .attr("transform", function(d, i) {
+                return "translate(" + ((width / 2) + PLOTBUFFER) * i + ", 0)";
+            })
+            .attr("class", "brainArea")
+            .attr("id", function(d) {
+                return d.key;
+            });
 
         plotG
             .each(drawParallel);
+        plotHistG
+            .each(drawHist);
 
         monkeySelector.selectAll("a").on("click", function() {
           params.curMonkey = d3.select(this).property("id");
@@ -223,6 +264,10 @@
                     .rangePoints([height, 0], 1);
 
                 dimColorScale = d3.scale.category10().domain(d3.values(mainEffects.dimensionOrder).reverse());
+
+                avgFiringScale = d3.scale.linear()
+                  .domain([0, 100])
+                  .range([0, (width - PLOTBUFFER) / 2]);
             }
             // Draws parallel line plot
         function drawParallel(brainArea) {
@@ -404,6 +449,50 @@
                       .text("Norm. Firing Rate");
 
                 }
+            }
+            // Draw Average Firing Rate Hist
+            function drawHist(brainArea) {
+              var curPlot = d3.select(this);
+              var avgFiring = brainArea.values.map(function(neuron) {
+                return +neuron["Average_Firing_Rate"];
+              });
+              var avgFiringHist = d3.layout.histogram()
+                .bins(avgFiringScale.ticks(100))
+                .frequency(false)
+                (avgFiring);
+              var yAvgFiringScale = d3.scale.linear()
+                   .domain([0, d3.max(avgFiringHist, function(d) { return d.y; })])
+                  .range([avgFiring_height, 0]);
+              var avgFiringAxis = d3.svg.axis()
+                .scale(avgFiringScale)
+                .orient("bottom");
+              var bar = curPlot.selectAll(".bar").data(avgFiringHist);
+              bar.exit()
+                .remove();
+              bar.enter()
+                .append("g")
+                  .attr("class", "bar");
+              bar.attr("transform", function(d) {
+                  return "translate(" + avgFiringScale(d.x) + "," + yAvgFiringScale(d.y) + ")";
+                });
+
+              var rect = bar.selectAll("rect").data(function(d) {return [d];});
+              rect.enter()
+                .append("rect")
+                  .attr("x", 1)
+                  .attr("width", avgFiringScale(avgFiringHist[0].dx) - 1);
+              rect
+                  .attr("height", function(d) {
+                    return avgFiring_height - yAvgFiringScale(d.y);
+                  });
+              var histAxisG = curPlot.selectAll("g.axis").data([{}]);
+              histAxisG.enter()
+                .append("g")
+                 .attr("class", "axis")
+                 .attr("transform", "translate(0," + avgFiring_height + ")");
+              histAxisG
+                 .call(avgFiringAxis);
+
             }
             // Returns the path for a given data point.
         function path(neuron) {

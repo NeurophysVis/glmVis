@@ -38,7 +38,7 @@
             }])
             .enter()
             .append("svg");
-        svg = d3.select("svg").attr({
+        svg = chart.select("svg").attr({
                 width: function(d) {
                     return d.width + margin.left + margin.right;
                 },
