@@ -585,10 +585,10 @@
 
           var timeInterval = d3.select("#intervalSelector a.selected").property("id");
           var timeMap = [
-            {timeInterval: "Intertrial Interval", cue: "start_time"},
+            {timeInterval: "Intertrial_Interval", cue: "start_time"},
             {timeInterval: "Fixation", cue: "fixation_onset"},
-            {timeInterval: "Rule Stimulus", cue: "rule_onset"},
-            {timeInterval: "Stimulus Response", cue: "stim_onset"},
+            {timeInterval: "Rule_Stimulus", cue: "rule_onset"},
+            {timeInterval: "Stimulus_Response", cue: "stim_onset"},
             {timeInterval: "Saccade", cue: "react_time"},
             {timeInterval: "Reward", cue: "reward_time"},
           ];
