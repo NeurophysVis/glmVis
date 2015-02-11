@@ -13,7 +13,7 @@
         var margin = {
                 top: 30,
                 right: 10,
-                bottom: 30,
+                bottom: -10,
                 left: 260
             },
             padding = {
