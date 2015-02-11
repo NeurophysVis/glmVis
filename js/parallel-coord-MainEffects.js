@@ -82,53 +82,29 @@
             // Embedded style file in the svg.
             style.text(txt);
             // ("#" + Math.random()) makes sure the script loads the file each time instead of using a cached version, remove once live
-            var timePeriod = params.timePeriod;
-            timePeriod = timePeriod.replace("_", " ");
-            var curFile = "DATA/" + timePeriod + " norm_apc main effects.csv" + "#" + Math.random();
+            queue()
+                .defer(d3.csv, "DATA/Intertrial Interval norm_apc main effects.csv")
+                .defer(d3.csv, "DATA/Fixation norm_apc main effects.csv")
+                .defer(d3.csv, "DATA/Rule Stimulus norm_apc main effects.csv")
+                .defer(d3.csv, "DATA/Stimulus Response norm_apc main effects.csv")
+                .defer(d3.csv, "DATA/Saccade norm_apc main effects.csv")
+                .defer(d3.csv, "DATA/Reward norm_apc main effects.csv")
+                .await(function(isError, Intertrial_Interval, Fixation, Rule_Stimulus, Stimulus_Response, Saccade, Reward) {
+                  // Draw visualization
+                  if (~isError){
+                    mainEffects.data = {
+                      "Intertrial_Interval": Intertrial_Interval,
+                      "Fixation": Fixation,
+                      "Rule_Stimulus": Rule_Stimulus,
+                      "Stimulus_Response": Stimulus_Response,
+                      "Saccade": Saccade,
+                      "Reward": Reward
+                    };
+                  }
+                  mainEffects.draw(params);
+                });
 
-            // Load csv data
-            d3.csv(curFile, function(error, csv) {
-
-                mainEffects.data = preProcess(csv); // copy to globally accessible object
-                // Draw visualization
-                mainEffects.draw(params);
-            }); // end csv loading function
         }); // End load style function
-
-        // Preprocess Data
-        function preProcess(data) {
-
-            var dimensionOrder = {
-
-                Medium_minus_Longest: "Normalized Prep Time",
-                Short_minus_Longest: "Normalized Prep Time",
-                Shortest_minus_Longest: "Normalized Prep Time",
-                Right_minus_Left: "Response Direction",
-                Incongruent_minus_Congruent: "Current Congruency",
-                Previous_Incongruent_minus_Previous_Congruent: "Previous Congruency",
-                Repetition10_minus_Repetition11plus: "Rule Repetition",
-                Repetition9_minus_Repetition11plus: "Rule Repetition",
-                Repetition8_minus_Repetition11plus: "Rule Repetition",
-                Repetition7_minus_Repetition11plus: "Rule Repetition",
-                Repetition6_minus_Repetition11plus: "Rule Repetition",
-                Repetition5_minus_Repetition11plus: "Rule Repetition",
-                Repetition4_minus_Repetition11plus: "Rule Repetition",
-                Repetition3_minus_Repetition11plus: "Rule Repetition",
-                Repetition2_minus_Repetition11plus: "Rule Repetition",
-                Repetition1_minus_Repetition11plus: "Rule Repetition",
-                Previous_Error_minus_No_Previous_Error: "Error History",
-                Orientation_minus_Color: "Rule"
-            };
-            // Extract plot dimensions
-            var dimensions = d3.keys(dimensionOrder).filter(function(dim) {
-                return d3.keys(data[0]).indexOf(dim) > -1;
-            });
-
-            mainEffects.dimensions = dimensions;
-            mainEffects.dimensionOrder = dimensionOrder;
-            return data;
-
-        }
     };
     mainEffects.draw = function(params) {
       var PLOTBUFFER = 30,
@@ -155,11 +131,11 @@
               .attr("class", "tooltip")
               .style("opacity", 1e-6);
         // Exclude neurons less than 1 Hz or not corresponding to the selected monkey
-        var neurons = mainEffects.data.filter(function(d) {
-            var isMonkey = (d["Monkey"] == curMonkey) || (curMonkey == "All");
-            return isMonkey;
+        var neurons = mainEffects.data[params.timePeriod].filter(function(d) {
+          return (d["Monkey"] == curMonkey) || (curMonkey == "All");
         });
 
+        preProcess(neurons);
         setupScales(neurons);
 
         // Nest data by brain area
@@ -194,16 +170,45 @@
 
         monkeySelector.selectAll("a").on("click", function() {
           params.curMonkey = d3.select(this).property("id");
-            mainEffects.draw(params);
-            rulePref.draw(params);
+          mainEffects.draw(params);
+          rulePref.draw(params);
 
         });
         timeSelector.selectAll("a").on("click", function() {
             params.timePeriod = d3.select(this).property("id");
-            mainEffects.loadData(params);
+            mainEffects.draw(params);
             rulePref.loadData(params);
         });
+        // Preprocess Data
+        function preProcess(data) {
 
+            var dimensionOrder = {
+                Medium_minus_Longest: "Normalized Prep Time",
+                Short_minus_Longest: "Normalized Prep Time",
+                Shortest_minus_Longest: "Normalized Prep Time",
+                Right_minus_Left: "Response Direction",
+                Incongruent_minus_Congruent: "Current Congruency",
+                Previous_Incongruent_minus_Previous_Congruent: "Previous Congruency",
+                Repetition10_minus_Repetition11plus: "Rule Repetition",
+                Repetition9_minus_Repetition11plus: "Rule Repetition",
+                Repetition8_minus_Repetition11plus: "Rule Repetition",
+                Repetition7_minus_Repetition11plus: "Rule Repetition",
+                Repetition6_minus_Repetition11plus: "Rule Repetition",
+                Repetition5_minus_Repetition11plus: "Rule Repetition",
+                Repetition4_minus_Repetition11plus: "Rule Repetition",
+                Repetition3_minus_Repetition11plus: "Rule Repetition",
+                Repetition2_minus_Repetition11plus: "Rule Repetition",
+                Repetition1_minus_Repetition11plus: "Rule Repetition",
+                Previous_Error_minus_No_Previous_Error: "Error History",
+                Orientation_minus_Color: "Rule"
+            };
+            // Extract plot dimensions
+            var dimensions = d3.keys(dimensionOrder).filter(function(dim) {
+                return d3.keys(data[0]).indexOf(dim) > -1;
+            });
+            mainEffects.dimensions = dimensions;
+            mainEffects.dimensionOrder = dimensionOrder;
+        }
         // Set up Scales
         function setupScales(data) {
                 var xMin = -1, xMax = 1;
