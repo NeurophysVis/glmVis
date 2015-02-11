@@ -9,7 +9,7 @@
         if (!params) {
             params = {};
         }
-        chart = d3.select("#figure2-chart"); // placeholder div for svg
+        chart = d3.select("#mainEffects-chart"); // placeholder div for svg
         var margin = {
                 top: 30,
                 right: 10,
@@ -438,20 +438,20 @@
                     }) ? null : "none";
                 });
                 // Select brushed neurons in main effects plot
-                var activeNeurons_ACC = d3.selectAll("#figure2-chart")
+                var activeNeurons_ACC = d3.selectAll("#mainEffects-chart")
                       .selectAll("#ACC")
                       .selectAll(".foreground").selectAll("path")
                       .filter(function() {
                         return d3.select(this).style("display") == "inline";
                       }).data(),
-                    activeNeurons_dlPFC = d3.selectAll("#figure2-chart")
+                    activeNeurons_dlPFC = d3.selectAll("#mainEffects-chart")
                         .selectAll("#dlPFC")
                         .selectAll(".foreground").selectAll("path")
                         .filter(function() {
                           return d3.select(this).style("display") == "inline";
                         }).data();
                 activeNeurons = activeNeurons_ACC.concat(activeNeurons_dlPFC);
-                d3.selectAll("#figure3-chart").selectAll(".foreground").selectAll("path").style("display", function(neuron) {
+                d3.selectAll("#ruleInteractions-chart").selectAll(".foreground").selectAll("path").style("display", function(neuron) {
                     return activeNeurons.some(function(d){
                       return (d.Name == neuron.Name);
                     }) ? null : "none";
