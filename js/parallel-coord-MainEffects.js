@@ -463,7 +463,7 @@
                 return +neuron["Average_Firing_Rate"];
               });
               avgFiringHist = d3.layout.histogram()
-                .bins(avgFiringScale.ticks(100))
+                .bins(avgFiringScale.ticks(50))
                 .frequency(false)
                 .value(function(d) {return d.Average_Firing_Rate;})
                 (brainArea.values);
@@ -673,6 +673,12 @@
             d3.selectAll(".foreground").selectAll("path").style("display", function(neuron) {
                 return (d.Name == neuron.Name) ? null : "none";
             })
+            // Select brushed neurons in average firing rate histogram
+            d3.selectAll(".foreground").selectAll("rect").style("display", function(rect_data) {
+              return (rect_data.some(function(e){
+                return d.Name == e.Name;
+              })) ? null : "none";
+            });
         }
         function mousedblclick(d){
 

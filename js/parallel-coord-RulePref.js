@@ -587,7 +587,13 @@
         function mouseclick(d) {
             d3.selectAll(".foreground").selectAll("path").style("display", function(neuron) {
                 return (d.Name == neuron.Name) ? null : "none";
-            })
+            });
+            // Select brushed neurons in average firing rate histogram
+            d3.selectAll(".foreground").selectAll("rect").style("display", function(rect_data) {
+              return (rect_data.some(function(e){
+                return d.Name == e.Name;
+              })) ? null : "none";
+            });
         }
         function mousedblclick(d){
 
