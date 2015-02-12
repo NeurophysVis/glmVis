@@ -178,7 +178,7 @@
         mainEffects.dimensions.map(function(dim) {
             brushes[dim] = d3.svg.brush()
                 .x(xScale)
-                .on("brush", brushed)
+                .on("brush", pathBrushed)
         });
 
         plotG = svg.selectAll("g.brainArea").data(neurons);
@@ -550,7 +550,7 @@
               //Add a brush
               brush = d3.svg.brush()
                 .x(avgFiringScale)
-                .on("brush", brushed);
+                .on("brush", histBrushed);
               brushG = curPlot.selectAll("g.brush").data([{}]);
               brushG.enter()
                   .append("g")
@@ -559,7 +559,7 @@
                     .selectAll("rect")
                       .attr("y", -6)
                       .attr("height", avgFiring_height + 7);
-              function brushed() {
+              function histBrushed() {
                 // Get max and min of brush in firing rate scale
                   var extent = brush.extent();
                   // Set display style of lines to none if average firing rate not within extent
@@ -594,7 +594,7 @@
                 return fixedName;
             }
             // Handles a brush event, toggling the display of foreground lines.
-        function brushed() {
+        function pathBrushed() {
                 // On brush, fade tool tip
                 toolTip
                     .style("opacity", 1e-6);
