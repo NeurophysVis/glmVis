@@ -50,7 +50,7 @@
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
             .attr("id", "drawingArea");
 
-        avgFiring_height = 200 - padding.top - padding.bottom - margin.top - margin.bottom;
+        avgFiring_height = 100 - margin.top - margin.bottom;
         avgFiring_chart = d3.select("#avgFiring-chart");
         avgFiring_chart.selectAll("svg")
           .data([{
@@ -461,7 +461,7 @@
                 .frequency(false)
                 (avgFiring);
               var yAvgFiringScale = d3.scale.linear()
-                   .domain([0, d3.max(avgFiringHist, function(d) { return d.y; })])
+                  .domain([0, d3.max(avgFiringHist, function(d) { return d.y; })])
                   .range([avgFiring_height, 0]);
               var avgFiringAxis = d3.svg.axis()
                 .scale(avgFiringScale)
@@ -473,7 +473,7 @@
                 .append("g")
                   .attr("class", "bar");
               bar.attr("transform", function(d) {
-                  return "translate(" + avgFiringScale(d.x) + "," + yAvgFiringScale(d.y) + ")";
+                  return "translate(" + avgFiringScale(d.x) + "," + 0 + ")";
                 });
 
               var rect = bar.selectAll("rect").data(function(d) {return [d];});
@@ -482,9 +482,14 @@
                   .attr("x", 1)
                   .attr("width", avgFiringScale(avgFiringHist[0].dx) - 1);
               rect
+                .transition()
+                .duration(1000)
                   .attr("height", function(d) {
                     return avgFiring_height - yAvgFiringScale(d.y);
-                  });
+                  })
+                  .attr("y", function(d) {
+                    return yAvgFiringScale(d.y);
+                  })
               var histAxisG = curPlot.selectAll("g.axis").data([{}]);
               histAxisG.enter()
                 .append("g")
