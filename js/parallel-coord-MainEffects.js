@@ -473,21 +473,19 @@
                 .scale(avgFiringScale)
                 .orient("bottom");
 
-              background = curPlot.selectAll("g#HistBack.background")
+              background = curPlot.selectAll("g.background")
                 .data([{}]);
               background.enter()
                 .append("g")
-                  .attr("class", "background")
-                  .attr("id", "HistBack");
+                  .attr("class", "background");
               background.exit()
                 .remove();
 
-              foreground = curPlot.selectAll("g#HistFore.foreground")
+              foreground = curPlot.selectAll("g.foreground")
                 .data([{}]);
               foreground.enter()
                 .append("g")
-                  .attr("class", "foreground")
-                  .attr("id", "HistFore");
+                  .attr("class", "foreground");
               foreground.exit()
                 .remove();
 
@@ -542,11 +540,10 @@
                     return yAvgFiringScale(d.y);
                   })
               // Axis
-              histAxisG = curPlot.selectAll("g#AvgFiringAxis.axis").data([{}]);
+              histAxisG = curPlot.selectAll("g.axis").data([{}]);
               histAxisG.enter()
                 .append("g")
                  .attr("class", "axis")
-                 .attr("id", "AvgFiringAxis")
                  .attr("transform", "translate(0," + avgFiring_height + ")");
               histAxisG
                  .call(avgFiringAxis);
