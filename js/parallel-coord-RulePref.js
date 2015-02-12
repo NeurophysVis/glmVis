@@ -547,6 +547,14 @@
                       return (d.Name == neuron.Name);
                     }) ? null : "none";
                 });
+                // Select brushed neurons in average firing rate histogram
+                d3.selectAll(".foreground").selectAll("rect").style("display", function(rect_data) {
+                  return (rect_data.some(function(d){
+                    return activeNeurons.some(function(e){
+                      return d.Name == e.Name;
+                    })
+                  })) ? null : "none";
+                });
             }
             // On mouseover, highlight line, pop up tooltip
         function mouseover(d) {

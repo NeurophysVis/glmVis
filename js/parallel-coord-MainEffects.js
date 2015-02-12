@@ -465,7 +465,8 @@
               avgFiringHist = d3.layout.histogram()
                 .bins(avgFiringScale.ticks(100))
                 .frequency(false)
-                (avgFiring_values);
+                .value(function(d) {return d.Average_Firing_Rate;})
+                (brainArea.values);
               yAvgFiringScale = d3.scale.linear()
                   .domain([0, d3.max(avgFiringHist, function(d) { return d.y; })])
                   .range([avgFiring_height, 0]);
@@ -573,7 +574,7 @@
                     // set display style to null (that is, it is displayed)
                     // else hide it
                     return (rect_data.some(function(d){
-                            return extent[0] <= d && d <= extent[1];
+                            return extent[0] <= d.Average_Firing_Rate && d.Average_Firing_Rate <= extent[1];
                     }) || brush.empty()) ? null : "none";
                   });
               }
@@ -611,7 +612,7 @@
                         return extents[activeInd][0] <= neuron[activeDim] && neuron[activeDim] <= extents[activeInd][1];
                     }) ? null : "none";
                 });
-                // Select brushed neurons in main effects plot
+                // Select brushed neurons in interactions plot
                 var activeNeurons_ACC = d3.selectAll("#mainEffects-chart")
                       .selectAll("#ACC")
                       .selectAll(".foreground").selectAll("path")
@@ -624,11 +625,20 @@
                         .filter(function() {
                           return d3.select(this).style("display") == "inline";
                         }).data();
-                activeNeurons = activeNeurons_ACC.concat(activeNeurons_dlPFC);
+                var activeNeurons = activeNeurons_ACC.concat(activeNeurons_dlPFC);
                 d3.selectAll("#ruleInteractions-chart").selectAll(".foreground").selectAll("path").style("display", function(neuron) {
                     return activeNeurons.some(function(d){
                       return (d.Name == neuron.Name);
                     }) ? null : "none";
+                });
+
+                // Select brushed neurons in average firing rate histogram
+                d3.selectAll(".foreground").selectAll("rect").style("display", function(rect_data) {
+                  return (rect_data.some(function(d){
+                    return activeNeurons.some(function(e){
+                      return d.Name == e.Name;
+                    })
+                  })) ? null : "none";
                 });
             }
             // On mouseover, highlight line, pop up tooltip
