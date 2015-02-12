@@ -59,6 +59,7 @@ svg {
   stroke-width: 1px;
   shape-rendering: crispEdges;
   stroke: #000;
+  fill: none;
 }
 .axis text {
   fill: #000;

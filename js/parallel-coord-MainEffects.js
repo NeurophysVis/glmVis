@@ -480,7 +480,8 @@
               rect.enter()
                 .append("rect")
                   .attr("x", 1)
-                  .attr("width", avgFiringScale(avgFiringHist[0].dx) - 1);
+                  .attr("width", avgFiringScale(avgFiringHist[0].dx) - 1)
+                  .attr("fill", "steelblue");
               rect
                 .transition()
                 .duration(1000)
@@ -490,10 +491,11 @@
                   .attr("y", function(d) {
                     return yAvgFiringScale(d.y);
                   })
-              var histAxisG = curPlot.selectAll("g.axis").data([{}]);
+              var histAxisG = curPlot.selectAll("g#AvgFiringAxis.axis").data([{}]);
               histAxisG.enter()
                 .append("g")
                  .attr("class", "axis")
+                 .attr("id", "AvgFiringAxis")
                  .attr("transform", "translate(0," + avgFiring_height + ")");
               histAxisG
                  .call(avgFiringAxis);
