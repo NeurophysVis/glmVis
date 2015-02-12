@@ -452,37 +452,62 @@
             }
             // Draw Average Firing Rate Hist
             function drawHist(brainArea) {
-              var curPlot = d3.select(this);
-              var avgFiring = brainArea.values.map(function(neuron) {
+
+              var curPlot, avgFiring_values, avgFiringHist, yAvgFiringScale,
+                  avgFiringAxis, foreBar, foreRect, backBar, backRect,
+                  histAxisG, foreground, background;
+
+              curPlot = d3.select(this);
+
+              avgFiring_values = brainArea.values.map(function(neuron) {
                 return +neuron["Average_Firing_Rate"];
               });
-              var avgFiringHist = d3.layout.histogram()
+              avgFiringHist = d3.layout.histogram()
                 .bins(avgFiringScale.ticks(100))
                 .frequency(false)
-                (avgFiring);
-              var yAvgFiringScale = d3.scale.linear()
+                (avgFiring_values);
+              yAvgFiringScale = d3.scale.linear()
                   .domain([0, d3.max(avgFiringHist, function(d) { return d.y; })])
                   .range([avgFiring_height, 0]);
-              var avgFiringAxis = d3.svg.axis()
+              avgFiringAxis = d3.svg.axis()
                 .scale(avgFiringScale)
                 .orient("bottom");
-              var bar = curPlot.selectAll(".bar").data(avgFiringHist);
-              bar.exit()
+
+              background = curPlot.selectAll("g#HistBack.background")
+                .data([{}]);
+              background.enter()
+                .append("g")
+                  .attr("class", "background")
+                  .attr("id", "HistBack");
+              background.exit()
                 .remove();
-              bar.enter()
+
+              foreground = curPlot.selectAll("g#HistFore.foreground")
+                .data([{}]);
+              foreground.enter()
+                .append("g")
+                  .attr("class", "foreground")
+                  .attr("id", "HistFore");
+              foreground.exit()
+                .remove();
+
+              // Foreground Histogram
+              foreBar = foreground.selectAll(".bar").data(avgFiringHist);
+              foreBar.exit()
+                .remove();
+              foreBar.enter()
                 .append("g")
                   .attr("class", "bar");
-              bar.attr("transform", function(d) {
+              foreBar.attr("transform", function(d) {
                   return "translate(" + avgFiringScale(d.x) + "," + 0 + ")";
                 });
 
-              var rect = bar.selectAll("rect").data(function(d) {return [d];});
-              rect.enter()
+              foreRect = foreBar.selectAll("rect").data(function(d) {return [d];});
+              foreRect.enter()
                 .append("rect")
                   .attr("x", 1)
-                  .attr("width", avgFiringScale(avgFiringHist[0].dx) - 1)
-                  .attr("fill", "steelblue");
-              rect
+                  .attr("width", avgFiringScale(avgFiringHist[0].dx) - 1);
+              foreRect
                 .transition()
                 .duration(1000)
                   .attr("height", function(d) {
@@ -491,7 +516,33 @@
                   .attr("y", function(d) {
                     return yAvgFiringScale(d.y);
                   })
-              var histAxisG = curPlot.selectAll("g#AvgFiringAxis.axis").data([{}]);
+              // Background Histogram
+              backBar = background.selectAll(".bar").data(avgFiringHist);
+              backBar.exit()
+                .remove();
+              backBar.enter()
+                .append("g")
+                  .attr("class", "bar");
+              backBar.attr("transform", function(d) {
+                  return "translate(" + avgFiringScale(d.x) + "," + 0 + ")";
+                });
+
+              backRect = backBar.selectAll("rect").data(function(d) {return [d];});
+              backRect.enter()
+                .append("rect")
+                  .attr("x", 1)
+                  .attr("width", avgFiringScale(avgFiringHist[0].dx) - 1);
+              backRect
+                .transition()
+                .duration(1000)
+                  .attr("height", function(d) {
+                    return avgFiring_height - yAvgFiringScale(d.y);
+                  })
+                  .attr("y", function(d) {
+                    return yAvgFiringScale(d.y);
+                  })
+              // Axis
+              histAxisG = curPlot.selectAll("g#AvgFiringAxis.axis").data([{}]);
               histAxisG.enter()
                 .append("g")
                  .attr("class", "axis")

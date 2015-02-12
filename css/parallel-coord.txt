@@ -25,6 +25,12 @@ svg {
   stroke: #ddd;
 }
 
+.background rect {
+  fill: #ddd;
+  stroke: none;
+  stroke-width: 1.5px;
+}
+
 .active {
   stroke-width: 2px;
   stroke: black;
@@ -33,6 +39,12 @@ svg {
 .foreground {
   fill: none;
   stroke: steelblue;
+  stroke-width: 1.5px;
+}
+
+.foreground rect {
+  fill: steelblue;
+  stroke: none;
   stroke-width: 1.5px;
 }
 
