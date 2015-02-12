@@ -455,7 +455,7 @@
 
               var curPlot, avgFiring_values, avgFiringHist, yAvgFiringScale,
                   avgFiringAxis, foreBar, foreRect, backBar, backRect,
-                  histAxisG, foreground, background;
+                  histAxisG, foreground, background, brushG, brush;
 
               curPlot = d3.select(this);
 
@@ -547,6 +547,36 @@
                  .attr("transform", "translate(0," + avgFiring_height + ")");
               histAxisG
                  .call(avgFiringAxis);
+              //Add a brush
+              brush = d3.svg.brush()
+                .x(avgFiringScale)
+                .on("brush", brushed);
+              brushG = curPlot.selectAll("g.brush").data([{}]);
+              brushG.enter()
+                  .append("g")
+                    .attr("class", "brush")
+                  .call(brush)
+                    .selectAll("rect")
+                      .attr("y", -6)
+                      .attr("height", avgFiring_height + 7);
+              function brushed() {
+                // Get max and min of brush in firing rate scale
+                  var extent = brush.extent();
+                  // Set display style of lines to none if average firing rate not within extent
+                  d3.selectAll(".foreground").selectAll("path").style("display", function(neuron) {
+                    return (extent[0] <= neuron["Average_Firing_Rate"]
+                          && neuron["Average_Firing_Rate"] <= extent[1] || brush.empty()) ? null : "none";
+                  });
+                  d3.selectAll(".foreground").selectAll("rect").style("display", function(rect_data) {
+                    // if some of the average firing rates associated with a
+                    // histogram bar is within the extent or the brush is empty
+                    // set display style to null (that is, it is displayed)
+                    // else hide it
+                    return (rect_data.some(function(d){
+                            return extent[0] <= d && d <= extent[1];
+                    }) || brush.empty()) ? null : "none";
+                  });
+              }
 
             }
             // Returns the path for a given data point.
