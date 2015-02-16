@@ -180,8 +180,8 @@
         });
         timeSelector.selectAll("a").on("click", function() {
             params.timePeriod = d3.select(this).property("id");
-            rulePref.loadData(params);
-            mainEffects.loadData(params);
+            rulePref.draw(params);
+            mainEffects.draw(params);
         });
 
         // Preprocess Data

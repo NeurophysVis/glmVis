@@ -218,7 +218,7 @@
         timeSelector.selectAll("a").on("click", function() {
             params.timePeriod = d3.select(this).property("id");
             mainEffects.draw(params);
-            rulePref.loadData(params);
+            rulePref.draw(params);
         });
         // Preprocess Data
         function preProcess(data) {
