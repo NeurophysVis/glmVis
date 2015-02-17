@@ -266,7 +266,7 @@
                 dimColorScale = d3.scale.category10().domain(d3.values(mainEffects.dimensionOrder).reverse());
 
                 avgFiringScale = d3.scale.linear()
-                  .domain([0, 100])
+                  .domain([0, 140])
                   .range([0, (width - PLOTBUFFER) / 2]);
             }
             // Draws parallel line plot
@@ -463,7 +463,7 @@
                 return +neuron["Average_Firing_Rate"];
               });
               avgFiringHist = d3.layout.histogram()
-                .bins(avgFiringScale.ticks(50))
+                .bins(avgFiringScale.ticks(40))
                 .frequency(false)
                 .value(function(d) {return d.Average_Firing_Rate;})
                 (brainArea.values);
