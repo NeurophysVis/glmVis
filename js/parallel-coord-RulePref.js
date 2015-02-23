@@ -412,14 +412,14 @@
                     arrowData = [{
                         "Name": "Orient.",
                         "values": [
-                            [xScale(0) + 100, height],
-                            [xScale(0) + 110, height]
+                            [xScale(0) + 100, height + 7],
+                            [xScale(0) + 110, height + 7]
                         ]
                     }, {
                         "Name": "Color",
                         "values": [
-                            [xScale(0) - 100, height],
-                            [xScale(0) - 110, height]
+                            [xScale(0) - 100, height + 7],
+                            [xScale(0) - 110, height+ 7]
                         ]
                     }];
                     arrowG = curPlot.selectAll("g.arrowLine").data([{}]);
@@ -442,7 +442,7 @@
                         .append("text")
                         .attr("class", "colorLabel")
                         .attr("x", xScale(0) - 10 + "px")
-                        .attr("y", height + "px")
+                        .attr("y", height + 7 + "px")
                         .attr("dy", 3 + "px")
                         .attr("text-anchor", "end")
                         .style("font-size", "12px")
@@ -451,7 +451,7 @@
                         .append("text")
                         .attr("class", "colorLabel")
                         .attr("x", xScale(0) - 20 + "px")
-                        .attr("y", height + 10 + "px")
+                        .attr("y", height + 17 + "px")
                         .attr("dy", 3 + "px")
                         .attr("text-anchor", "end")
                         .style("font-size", "12px")
@@ -461,7 +461,7 @@
                         .append("text")
                         .attr("class", "orientLabel")
                         .attr("x", xScale(0) + 10 + "px")
-                        .attr("y", height + "px")
+                        .attr("y", height + 7 + "px")
                         .attr("dy", 3 + "px")
                         .attr("text-anchor", "start")
                         .style("font-size", "12px")
@@ -470,7 +470,7 @@
                         .append("text")
                         .attr("class", "orientLabel")
                         .attr("x", xScale(0) + 20 + "px")
-                        .attr("y", height + 10 + "px")
+                        .attr("y", height + 17 + "px")
                         .attr("dy", 3 + "px")
                         .attr("text-anchor", "start")
                         .style("font-size", "12px")
