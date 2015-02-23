@@ -224,6 +224,7 @@
         function preProcess(data) {
 
             var dimensionOrder = {
+                Long_minus_Longest: "Normalized Prep Time",
                 Medium_minus_Longest: "Normalized Prep Time",
                 Short_minus_Longest: "Normalized Prep Time",
                 Shortest_minus_Longest: "Normalized Prep Time",
