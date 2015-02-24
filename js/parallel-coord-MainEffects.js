@@ -421,7 +421,6 @@
                 overCircle.enter()
                   .append("circle")
                     .attr("r", 3)
-                    .attr("cy", function(d) {return yScale(d.dimension);})
                     .attr("fill", "steelblue");
                 overCircle.exit()
                   .remove();
@@ -438,8 +437,12 @@
                   var timeCue = timeMap.filter(function(d) {
                     return d.timeInterval == timeInterval;
                   });
-                  console.log(mainEffects.dimensionOrder[d.dimension]);
-                  // window.location = "/RasterVis/index.html?curFile=" + d.Session_Name + "&curNeuron=" + d.Name + "&curTime=" + timeCue[0].cue;
+                  var pat = / /;
+                  window.location = "/RasterVis/index.html?"
+                      + "curFile=" + d.Session_Name
+                      + "&curNeuron=" + d.Name
+                      + "&curTime=" + timeCue[0].cue
+                      + "&curFactor=" + mainEffects.dimensionOrder[d.dimension].replace(pat, "_");
                 });
                 // Transition back and fore lines at the same time to their current position
                 d3.transition()
@@ -451,9 +454,8 @@
                         foreLines.transition()
                             .attr("d", path);
                         overCircle.transition()
-                            .attr("cx", function(d) {
-                              return d.x;
-                              });
+                            .attr("cx", function(d) {return d.x;})
+                            .attr("cy", function(d) {return yScale(d.dimension);})
                     })
                     .transition()
                     .duration(500)
