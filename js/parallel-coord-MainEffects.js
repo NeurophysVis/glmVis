@@ -442,7 +442,8 @@
                       + "curFile=" + d.Session_Name
                       + "&curNeuron=" + d.Name
                       + "&curTime=" + timeCue[0].cue
-                      + "&curFactor=" + mainEffects.dimensionOrder[d.dimension].replace(pat, "_");
+                      + "&curFactor=" + mainEffects.dimensionOrder[d.dimension].replace(pat, "_")
+                      + "&color=Neutral";
                 });
                 // Transition back and fore lines at the same time to their current position
                 d3.transition()
