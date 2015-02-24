@@ -224,11 +224,11 @@
         function preProcess(data) {
 
             var dimensionOrder = {
-                Long_minus_Longest: "Normalized Prep Time",
-                Medium_minus_Longest: "Normalized Prep Time",
-                Short_minus_Longest: "Normalized Prep Time",
-                Shortest_minus_Longest: "Normalized Prep Time",
-                Right_minus_Left: "Response Direction",
+                Long_minus_Longest: "Preparation Time",
+                Medium_minus_Longest: "Preparation Time",
+                Short_minus_Longest: "Preparation Time",
+                Shortest_minus_Longest: "Preparation Time",
+                Right_minus_Left: "Preparation Time",
                 Incongruent_minus_Congruent: "Current Congruency",
                 Previous_Incongruent_minus_Previous_Congruent: "Previous Congruency",
                 Repetition10_minus_Repetition11plus: "Rule Repetition",
@@ -241,7 +241,7 @@
                 Repetition3_minus_Repetition11plus: "Rule Repetition",
                 Repetition2_minus_Repetition11plus: "Rule Repetition",
                 Repetition1_minus_Repetition11plus: "Rule Repetition",
-                Previous_Error_minus_No_Previous_Error: "Error History",
+                Previous_Error_minus_No_Previous_Error: "Previous Error",
                 Orientation_minus_Color: "Rule"
             };
             // Extract plot dimensions

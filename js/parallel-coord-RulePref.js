@@ -188,11 +188,11 @@
         function preProcess(data) {
 
             var dimensionOrder = {
-                Shortest: "Normalized Prep Time",
-                Short: "Normalized Prep Time",
-                Medium: "Normalized Prep Time",
-                Long: "Normalized Prep Time",
-                Longest: "Normalized Prep Time",
+                Shortest: "Preparation Time",
+                Short: "Preparation Time",
+                Medium: "Preparation Time",
+                Long: "Preparation Time",
+                Longest: "Preparation Time",
                 Left: "Response Direction",
                 Right: "Response Direction",
                 Congruent: "Current Congruency",
@@ -213,9 +213,9 @@
                 Repetition3: "Rule Repetition",
                 Repetition2: "Rule Repetition",
                 Repetition1: "Rule Repetition",
-                No_Previous_Error: "Error History",
-                Previous_Error: "Error History",
-                Overall: "Overall"
+                No_Previous_Error: "Previous Error",
+                Previous_Error: "Previous Error",
+                Overall: "Rule"
             };
             // Extract plot dimensions
             var dimensions = d3.keys(dimensionOrder).filter(function(dim) {
