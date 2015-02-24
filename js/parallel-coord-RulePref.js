@@ -247,7 +247,8 @@
                 var foreground, background, dimG, axisG, brushG,
                     backLines, foreLines, title, zeroGroup, zeroLine,
                     arrowData, arrowLine, arrowG, arrowEnter, orientLabel,
-                    colorLabel, xAxisLabel, solidAxis, overLines;
+                    colorLabel, xAxisLabel, solidAxis, overlay, overLines,
+                    overG, overCircle;
 
                 // Add grey background lines for context.
                 background = curPlot.selectAll("g.background")
@@ -407,8 +408,8 @@
                   var timeCue = timeMap.filter(function(d) {
                     return d.timeInterval == timeInterval;
                   });
-                  console.log(d.dimension);
-                  window.location = "/RasterVis/index.html?curFile=" + d.Session_Name + "&curNeuron=" + d.Name + "&curTime=" + timeCue[0].cue;
+                  console.log(rulePref.dimensionOrder[d.dimension]);
+                  // window.location = "/RasterVis/index.html?curFile=" + d.Session_Name + "&curNeuron=" + d.Name + "&curTime=" + timeCue[0].cue;
                 });
 
                 // Transition back and fore lines at the same time to their current position

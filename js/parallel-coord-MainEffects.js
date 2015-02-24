@@ -277,7 +277,8 @@
                 var foreground, background, dimG, axisG, brushG,
                     backLines, foreLines, title, zeroGroup, zeroLine,
                     arrowData, arrowLine, arrowG, arrowEnter, orientLabel,
-                    colorLabel, xAxisLabel;
+                    colorLabel, xAxisLabel, overlay, overLines,
+                    overG, overCircle;
 
                 // Add grey background lines for context.
                 background = curPlot.selectAll("g.background")
@@ -395,6 +396,51 @@
                     .remove();
                 foreLines.enter()
                     .append("path");
+                // Overlay
+                var overlay = curPlot.selectAll("g.overlay").data([{}]);
+                overlay.enter()
+                    .append("g")
+                    .attr("class", "overlay");
+                var overG = overlay.selectAll("g")
+                    .data(brainArea.values, function(d) {
+                        return d.Name;
+                    });
+                overG.enter()
+                  .append("g")
+                    .style("display", "none");
+                var overCircle = overG.selectAll("circle").data(function(neuron) {
+                  return mainEffects.dimensions.map(function(dim) {
+                        return {
+                            x: xScale(+neuron[dim]),
+                            dimension: dim,
+                            Session_Name: neuron.Session_Name,
+                            Name: neuron.Name
+                        };
+                    });
+                  });
+                overCircle.enter()
+                  .append("circle")
+                    .attr("r", 3)
+                    .attr("cy", function(d) {return yScale(d.dimension);})
+                    .attr("fill", "steelblue");
+                overCircle.exit()
+                  .remove();
+                overCircle.on("click", function(d) {
+                  var timeInterval = d3.select("#intervalSelector a.selected").property("id");
+                  var timeMap = [
+                    {timeInterval: "Intertrial_Interval", cue: "start_time"},
+                    {timeInterval: "Fixation", cue: "fixation_onset"},
+                    {timeInterval: "Rule_Stimulus", cue: "rule_onset"},
+                    {timeInterval: "Stimulus_Response", cue: "stim_onset"},
+                    {timeInterval: "Saccade", cue: "react_time"},
+                    {timeInterval: "Reward", cue: "reward_time"},
+                  ];
+                  var timeCue = timeMap.filter(function(d) {
+                    return d.timeInterval == timeInterval;
+                  });
+                  console.log(mainEffects.dimensionOrder[d.dimension]);
+                  // window.location = "/RasterVis/index.html?curFile=" + d.Session_Name + "&curNeuron=" + d.Name + "&curTime=" + timeCue[0].cue;
+                });
                 // Transition back and fore lines at the same time to their current position
                 d3.transition()
                     .duration(1000)
@@ -404,6 +450,10 @@
                             .attr("d", path);
                         foreLines.transition()
                             .attr("d", path);
+                        overCircle.transition()
+                            .attr("cx", function(d) {
+                              return d.x;
+                              });
                     })
                     .transition()
                     .duration(500)
@@ -641,6 +691,7 @@
                     })
                   })) ? null : "none";
                 });
+                d3.selectAll(".overlay").selectAll("g").style("display", "none");
             }
             // On mouseover, highlight line, pop up tooltip
         function mouseover(d) {
@@ -674,6 +725,9 @@
             d3.selectAll(".foreground").selectAll("path").style("display", function(neuron) {
                 return (d.Name == neuron.Name) ? null : "none";
             })
+            d3.selectAll(".overlay").selectAll("g").style("display", function(neuron) {
+                return (d.Name == neuron.Name) ? null : "none";
+            });
             // Select brushed neurons in average firing rate histogram
             d3.selectAll(".foreground").selectAll("rect").style("display", function(rect_data) {
               return (rect_data.some(function(e){
