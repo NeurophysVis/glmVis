@@ -365,7 +365,8 @@
                     .style("opacity", 1E-6)
                     .remove();
                 foreLines.enter()
-                    .append("path");
+                    .append("path")
+                    .attr("id", function(d) {return d.Name;});
                 // Overlay
                 var overlay = curPlot.selectAll("g.overlay").data([{}]);
                 overlay.enter()
@@ -377,6 +378,7 @@
                     });
                 overG.enter()
                   .append("g")
+                    .attr("id", function(d) {return d.Name;})
                     .style("display", "none");
                 var overCircle = overG.selectAll("circle").data(function(neuron) {
                   return rulePref.dimensions.map(function(dim) {
