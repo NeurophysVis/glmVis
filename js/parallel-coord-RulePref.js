@@ -438,7 +438,6 @@
                             .attr("transform", function(d) {
                                 return "translate(0," + yScale(d) + ")";
                             })
-                            .transition()
                             .style("opacity", 1);
                     });
                 foreLines
