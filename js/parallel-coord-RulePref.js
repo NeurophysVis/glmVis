@@ -396,21 +396,20 @@
                     .attr("fill", "steelblue");
                 overCircle.exit()
                   .remove();
+                var timeInterval = d3.select("#intervalSelector a.selected").property("id");
+                var timeMap = [
+                  {timeInterval: "Intertrial_Interval", cue: "start_time"},
+                  {timeInterval: "Fixation", cue: "fixation_onset"},
+                  {timeInterval: "Rule_Stimulus", cue: "rule_onset"},
+                  {timeInterval: "Stimulus_Response", cue: "stim_onset"},
+                  {timeInterval: "Saccade", cue: "react_time"},
+                  {timeInterval: "Reward", cue: "reward_time"},
+                ];
+                var timeCue = timeMap.filter(function(d) {
+                  return d.timeInterval == timeInterval;
+                });
+                var pat = / /;
                 overCircle.on("click", function(d) {
-                  var timeInterval = d3.select("#intervalSelector a.selected").property("id");
-                  var timeMap = [
-                    {timeInterval: "Intertrial_Interval", cue: "start_time"},
-                    {timeInterval: "Fixation", cue: "fixation_onset"},
-                    {timeInterval: "Rule_Stimulus", cue: "rule_onset"},
-                    {timeInterval: "Stimulus_Response", cue: "stim_onset"},
-                    {timeInterval: "Saccade", cue: "react_time"},
-                    {timeInterval: "Reward", cue: "reward_time"},
-                  ];
-                  var timeCue = timeMap.filter(function(d) {
-                    return d.timeInterval == timeInterval;
-                  });
-                  var pat = / /;
-
                   window.location = "/RasterVis/index.html?"
                       + "curFile=" + d.Session_Name
                       + "&curNeuron=" + d.Name
@@ -445,8 +444,7 @@
                 foreLines
                     .on("mouseover", mouseover)
                     .on("mouseout", mouseout)
-                    .on("click", mouseclick)
-                    .on("dblclick", mousedblclick)
+                    .on("click", mouseclick);
 
                     // Axis with numbers
                 solidAxis = curPlot.selectAll("g.axis").data([{}]);
@@ -654,22 +652,6 @@
                 return d.Name == e.Name;
               })) ? null : "none";
             });
-        }
-        function mousedblclick(d){
-
-          var timeInterval = d3.select("#intervalSelector a.selected").property("id");
-          var timeMap = [
-            {timeInterval: "Intertrial_Interval", cue: "start_time"},
-            {timeInterval: "Fixation", cue: "fixation_onset"},
-            {timeInterval: "Rule_Stimulus", cue: "rule_onset"},
-            {timeInterval: "Stimulus_Response", cue: "stim_onset"},
-            {timeInterval: "Saccade", cue: "react_time"},
-            {timeInterval: "Reward", cue: "reward_time"},
-          ];
-          var timeCue = timeMap.filter(function(d) {
-            return d.timeInterval == timeInterval;
-          });
-          window.location = "/RasterVis/index.html?curFile=" + d.Session_Name + "&curNeuron=" + d.Name + "&curTime=" + timeCue[0].cue;
         }
     }
 

@@ -55,7 +55,7 @@
         var chartParams = {
               timePeriod: "Intertrial_Interval",
               width: 960,
-              height: 400
+              height: 550
         };
         // Extract parameters from the browser
         var query = window.location.search.substring(1);
@@ -65,9 +65,8 @@
           chartParams[p[0]] = p[1];
         })
         // Initialized visualization
-        rulePref.init(chartParams);
         mainEffects.init(chartParams);
-
+        rulePref.init(chartParams);
     </script>
 
 </body>
