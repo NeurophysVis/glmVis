@@ -228,7 +228,7 @@
                 Medium_minus_Longest: "Preparation Time",
                 Short_minus_Longest: "Preparation Time",
                 Shortest_minus_Longest: "Preparation Time",
-                Right_minus_Left: "Preparation Time",
+                Right_minus_Left: "Response Direction",
                 Incongruent_minus_Congruent: "Current Congruency",
                 Previous_Incongruent_minus_Previous_Congruent: "Previous Congruency",
                 Repetition10_minus_Repetition11plus: "Rule Repetition",
