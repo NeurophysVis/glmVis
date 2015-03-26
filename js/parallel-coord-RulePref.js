@@ -320,7 +320,7 @@
                       .attr("x", -5)
                       .attr("y", 3)
                       .text(function(dim) {
-                        return (brainArea.key === 'dlPFC') ? "" : fixDimNames(dim);
+                        return (brainArea.key === 'dlPFC') ? "" : "Rule @ " + fixDimNames(dim);
                       })
                       .style("fill", function(d) {
                         return dimColorScale(rulePref.dimensionOrder[d]);
