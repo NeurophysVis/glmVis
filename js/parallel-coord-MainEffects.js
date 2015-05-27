@@ -473,11 +473,9 @@
       var pat = / /;
       overCircle.on('click', function(d) {
         window.location = '/RasterVis/index.html?' +
-            'curFile=' + d.Session_Name +
             '&curNeuron=' + d.Name +
             '&curTime=' + timeCue[0].cue +
-            '&curFactor=' + mainEffects.dimensionOrder[d.dimension].replace(pat, '_') +
-            '&color=Neutral';
+            '&curFactor=' + mainEffects.dimensionOrder[d.dimension].replace(pat, '_');
       });
 
       // Transition back and fore lines at the same time to their current position

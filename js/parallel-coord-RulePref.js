@@ -438,10 +438,10 @@
       var pat = / /;
       overCircle.on('click', function(d) {
                 window.location = '/RasterVis/index.html?' +
-                    'curFile=' + d.Session_Name +
                     '&curNeuron=' + d.Name +
                     '&curTime=' + timeCue[0].cue +
-                    '&curFactor=' + rulePref.dimensionOrder[d.dimension].replace(pat, '_');
+                    '&curFactor=' + rulePref.dimensionOrder[d.dimension].replace(pat, '_') +
+                    '&color=Rule';
               });
 
       // Transition back and fore lines at the same time to their current position
