@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/edeno/glmVis.git"
+    "url": "git+https://github.com/NeurophysVis/glmVis.git"
   },
   "keywords": [
     "GLM",
@@ -21,9 +21,9 @@
   "author": "Eric Denovellis <edenovellis@msn.com> (http://ericdeno.com)",
   "license": "GPL-2.0",
   "bugs": {
-    "url": "https://github.com/edeno/glmVis/issues"
+    "url": "https://github.com/NeurophysVis/glmVis/issues"
   },
-  "homepage": "https://github.com/edeno/glmVis#readme",
+  "homepage": "https://github.com/NeurophysVis/glmVis#readme",
   "devDependencies": {
     "bower": "^1.7.7",
     "gulp": "^3.9.0",

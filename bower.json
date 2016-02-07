@@ -14,7 +14,7 @@
     "receptive",
     "field"
   ],
-  "homepage": "https://github.com/edeno/glmVis",
+  "homepage": "https://github.com/NeurophysVis/glmVis",
   "moduleType": [],
   "ignore": [
     "**/.*",
@@ -24,8 +24,9 @@
     "tests"
   ],
   "dependencies": {
-    "bootstrap": "~3.3.6",
-    "colorbrewer": "~1.0.0",
-    "d3-legend": "~1.8.0"
+    "bootstrap": "^3.3.6",
+    "colorbrewer": "^1.0.0",
+    "d3-legend": "^1.8.0",
+    "d3": "^3.5.14"
   }
 }
