@@ -1,0 +1,31 @@
+{
+  "name": "glmvis",
+  "description": "Visualization of generalized linear model coefficients for neurons",
+  "main": "index.js",
+  "authors": [
+    "Eric Denovellis <edenovellis@msn.com> (http://ericdeno.com)"
+  ],
+  "license": "GPL-2.0",
+  "keywords": [
+    "GLM",
+    "neuroscience",
+    "visualization",
+    "neuron",
+    "receptive",
+    "field"
+  ],
+  "homepage": "https://github.com/edeno/glmVis",
+  "moduleType": [],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "~3.3.6",
+    "colorbrewer": "~1.0.0",
+    "d3-legend": "~1.8.0"
+  }
+}

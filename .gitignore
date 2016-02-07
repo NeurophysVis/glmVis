@@ -2,6 +2,8 @@
 .json
 .mat
 DATA/
+bower_components
+node_modules
 
 # Windows image file caches
 Thumbs.db
@@ -31,7 +33,7 @@ $RECYCLE.BIN/
 .LSOverride
 
 # Icon must ends with two \r.
-Icon
+Icon
 
 # Thumbnails
 ._*
