@@ -129,7 +129,7 @@
     timeSelector.selectAll('a#' + params.timePeriod).classed('selected', true);
 
     // Update window substring
-    window.history.pushState({}, '', '/Parallel-Coordinates-APC/index.html?curMonkey=' + curMonkey +
+    window.history.pushState({}, '', 'index.html?curMonkey=' + curMonkey +
                                                             '&timePeriod=' + params.timePeriod);
 
     // Tool Tip - make a hidden div to appear as a tooltip when mousing over a line
